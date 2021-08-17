@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<syntax name="context">
+    <meta>
+        <name>ConTeXt</name>
+        <type>structured</type>
+        <preferred-file-extension>tex</preferred-file-extension>
+    </meta>
+        
+    <detectors>
+        <extension priority="0.4">tex</extension>
+        <extension priority="1.0">context,mkii,mkiv</extension>
+        <match-content lines="20" priority="0.9">\\start</match-content>
+        <match-content lines="20" priority="0.9">\\definestartstop</match-content>
+    </detectors>
+    
+    <indentation>
+        <increase>
+            <expression>\\if|\\else|\\start|\{|\[</expression>
+        </increase>
+        <decrease>
+            <expression>\\fi|\\else|\\stop|\}|\]</expression>
+        </decrease>
+    </indentation>
+    
+    <comments>
+        <single>%</single>
+    </comments>
+    
+    <brackets>
+        <pair open="{" close="}" />
+        <pair open="[" close="]" />
+    </brackets>
+    
+    <surrounding-pairs>
+        <pair open="$" close="$" />
+    </surrounding-pairs>
+        
+    <scopes spell-check="true">
+        <include syntax="self" collection="math"/>
+        <include syntax="self" collection="environments"/>
+        <include syntax="tex" collection="headings"/>
+        <include syntax="tex" collection="simple"/>
+        <include syntax="tex" collection="optional"/>
+        <include syntax="tex" collection="symbols"/>
+    </scopes>
+        
+    <collections>
+        <collection name="environments">
+            <scope name="tex.verbatim" spell-check="false">
+                <symbol type="block">
+                    <context behavior="subtree"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\starttyping\b</expression>
+                    <capture number="0" name="tex.keyword.construct"/>
+                </starts-with>
+                <ends-with>
+                    <template>\\stoptyping\b</template>
+                    <capture number="0" name="tex.keyword.construct"/>
+                </ends-with>
+                <subscopes anchored="true">
+                    <include syntax="tex" collection="optional" optional="true"/>
+                    <scope name="tex.markup.code" repeat="true">
+                        <expression>.*</expression>
+                    </scope>
+                </subscopes>
+            </scope>
+            <scope name="tex.math.environment" spell-check="false">
+                <symbol type="block">
+                    <context behavior="subtree"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\startformula\b</expression>
+                    <capture number="0" name="tex.keyword.construct"/>
+                </starts-with>
+                <ends-with>
+                    <template>\\stopformula\b</template>
+                    <capture number="0" name="tex.keyword.construct"/>
+                </ends-with>
+                <subscopes>
+                    <include syntax="tex" collection="math-content"/>
+                    <include syntax="self"/>
+                </subscopes>
+            </scope>
+            <scope name="tex.environment.start" spell-check="false">
+                <symbol type="block" name-selector="tex.keyword.construct.name">
+                    <context behavior="start">
+                        <auto-close string="\stop" completion="${name}" />
+                    </context>
+                </symbol>
+                <expression>(\\start)(\w+)</expression>
+                <capture number="1" name="tex.keyword.construct"/>
+                <capture number="2" name="tex.keyword.construct.name"/>
+            </scope>
+            <scope name="tex.environment.stop" spell-check="false">
+                <symbol type="block" name-selector="tex.keyword.construct.name">
+                    <context behavior="end"/>
+                </symbol>
+                <expression>(\\stop)(\w+)</expression>
+                <capture number="1" name="tex.keyword.construct"/>
+                <capture number="2" name="tex.keyword.construct.name"/>
+            </scope>
+        </collection>
+        <collection name="math">
+            <scope name="tex.math.inline" spell-check="false">
+                <starts-with>
+                    <expression>\$(?!\$)</expression>
+                    <capture number="0" name="tex.math.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>\$(?!\$)</expression>
+                    <capture number="0" name="tex.math.bracket" />
+                </ends-with>
+                <subscopes>
+                    <include syntax="tex" collection="math-content"/>
+                    <include syntax="self"/>
+                </subscopes>
+            </scope>
+            <scope name="tex.math.display" spell-check="false">
+                <starts-with>
+                    <expression>\$\$</expression>
+                    <capture number="0" name="tex.math.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>\$\$</expression>
+                    <capture number="0" name="tex.math.bracket" />
+                </ends-with>
+                <subscopes>
+                    <include syntax="tex" collection="math-content"/>
+                    <include syntax="self"/>
+                </subscopes>
+            </scope>
+            <scope name="tex.math.inline.context" spell-check="false">
+                <starts-with>
+                    <expression>(\\m(ath(ematics)?)?)(\{)</expression>
+                    <capture number="1" name="tex.keyword"/>
+                    <capture number="2" name="tex.math.bracket" />
+                </starts-with>
+                <ends-with>
+                    <expression>\}</expression>
+                    <capture number="0" name="tex.math.bracket" />
+                </ends-with>
+                <subscopes>
+                    <include syntax="tex" collection="math-content"/>
+                    <include syntax="self"/>
+                </subscopes>
+            </scope>
+        </collection>
+    </collections>
+</syntax>

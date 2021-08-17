@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<syntax name="tex">
+    <meta>
+        <name>TeX</name>
+        <type>structured</type>
+        <preferred-file-extension>tex</preferred-file-extension>
+    </meta>
+    
+    <detectors>
+        <extension priority="0.5">tex</extension>
+    </detectors>
+    
+    <indentation>
+        <increase>
+            <expression>\\if|\\else|\{</expression>
+        </increase>
+        <decrease>
+            <expression>\\fi|\\else|\}</expression>
+        </decrease>
+    </indentation>
+    
+    <comments>
+        <single>%</single>
+    </comments>
+    
+    <brackets>
+        <pair open="{" close="}" />
+        <pair open="[" close="]" />
+    </brackets>
+    
+    <surrounding-pairs>
+        <pair open="$" close="$" />
+    </surrounding-pairs>
+    
+    <scopes spell-check="true">
+        <scope name="tex.math.inline" spell-check="false">
+            <starts-with>
+                <expression>\$(?!\$)</expression>
+                <capture number="0" name="tex.math.bracket" />
+            </starts-with>
+            <ends-with>
+                <expression>\$(?!\$)</expression>
+                <capture number="0" name="tex.math.bracket" />
+            </ends-with>
+            <subscopes>
+                <include syntax="self" collection="math-content"/>
+                <include syntax="self"/>
+            </subscopes>
+        </scope>
+        <scope name="tex.math.display" spell-check="false">
+            <starts-with>
+                <expression>\$\$</expression>
+                <capture number="0" name="tex.math.bracket" />
+            </starts-with>
+            <ends-with>
+                <expression>\$\$</expression>
+                <capture number="0" name="tex.math.bracket" />
+            </ends-with>
+            <subscopes>
+                <include syntax="self" collection="math-content"/>
+                <include syntax="self"/>
+            </subscopes>
+        </scope>
+        <include syntax="self" collection="simple"/>
+        <include syntax="self" collection="symbols"/>
+    </scopes>
+    
+    <collections>
+        <collection name="simple">
+            <scope name="tex.comment">
+                <expression>%(.*)$</expression>
+                <capture number="1" name="tex.comment.content"/>
+            </scope>
+            <scope name="tex.keyword" spell-check="false">
+                <expression>\\(\w+\*?)</expression>
+                <capture number="1" name="tex.command.name"/>
+            </scope>
+            <scope name="tex.keyword.symbol" spell-check="false">
+                <expression>\\([^\w])</expression>
+            </scope>
+            <scope name="tex.processing" spell-check="false">
+                <expression>\#\d</expression>
+            </scope>
+        </collection>
+        <collection name="symbols">
+            <scope name="tex.value.number" spell-check="false">
+                <expression>(\d+|\d*\.\d+)(pt|mm|cm|in|ex|em|bp|pc|dd|cc|nd|nc|sp)?</expression>
+            </scope>
+            <scope name="tex.bracket">
+                <expression>[\{\}\[\]]</expression>
+            </scope>
+            <scope name="tex.operator">
+                <expression>[&amp;_\^~]</expression>
+            </scope>
+        </collection>
+        <collection name="optional">
+            <scope name="tex.optional">
+                <starts-with>
+                    <expression>(\[)</expression>
+                    <capture number="1" name="tex.bracket"/>
+                </starts-with>
+                <ends-with>
+                    <expression>(\])</expression>
+                    <capture number="1" name="tex.bracket"/>
+                </ends-with>
+                <subscopes>
+                     <scope name="tex.comma">
+                        <expression>,</expression>
+                     </scope>
+                     <scope name="tex.named" spell-check="false">
+                        <expression>([\s\w]+)(=)</expression>
+                        <capture number="1" name="tex.string.key"/>
+                        <capture number="2" name="tex.operator"/>
+                     </scope>
+                     <include syntax="self" />
+                </subscopes>
+            </scope>
+        </collection>
+        <collection name="math-content">
+            <scope name="tex.value.number" spell-check="false">
+                <expression>(\d+|\d*\.\d+)(pt|mm|cm|in|ex|em|bp|pc|dd|cc|nd|nc|sp)?</expression>
+            </scope>
+            <scope name="tex.math.string" spell-check="false">
+                <expression>\p{L}+</expression>
+            </scope>
+            <scope name="tex.math.operator">
+                <expression>[\+\-\*/\^_]</expression>
+            </scope>
+        </collection>
+        <collection name="headings">
+            <scope name="tex.heading.part" spell-check="false">
+                <symbol type="heading">
+                    <context behavior="next" group="part" priority="100"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\part</expression>
+                    <capture number="0" name="tex.keyword"/>
+                </starts-with>
+                <ends-with/>
+                <subscopes anchored="true">
+                    <include syntax="tex" collection="optional" optional="true"/>
+                    <scope name="tex.bracket">
+                        <expression>\{</expression>
+                    </scope>
+                    <scope name="tex.heading.part.name" optional="true" spell-check="true">
+                        <expression>[^\{\}\\%\#]+</expression>
+                    </scope>
+                </subscopes>
+            </scope>
+            <scope name="tex.heading.chapter" spell-check="false">
+                <symbol type="heading">
+                    <context behavior="next" group="chapter" priority="90"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\chapter</expression>
+                    <capture number="0" name="tex.keyword"/>
+                </starts-with>
+                <ends-with/>
+                <subscopes anchored="true">
+                    <include syntax="tex" collection="optional" optional="true"/>
+                    <scope name="tex.bracket">
+                        <expression>\{</expression>
+                    </scope>
+                    <scope name="tex.heading.chapter.name" optional="true" spell-check="true">
+                        <expression>[^\{\}\\%\#]+</expression>
+                    </scope>
+                </subscopes>
+            </scope>
+            <scope name="tex.heading.section" spell-check="false">
+                <symbol type="heading">
+                    <context behavior="next" group="section" priority="80"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\section</expression>
+                    <capture number="0" name="tex.keyword"/>
+                </starts-with>
+                <ends-with/>
+                <subscopes anchored="true">
+                    <include syntax="tex" collection="optional" optional="true"/>
+                    <scope name="tex.bracket">
+                        <expression>\{</expression>
+                    </scope>
+                    <scope name="tex.heading.section.name" optional="true" spell-check="true">
+                        <expression>[^\{\}\\%\#]+</expression>
+                    </scope>
+                </subscopes>
+            </scope>
+            <scope name="tex.heading.subsection" spell-check="false">
+                <symbol type="heading">
+                    <context behavior="next" group="subsection" priority="70"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\subsection</expression>
+                    <capture number="0" name="tex.keyword"/>
+                </starts-with>
+                <ends-with/>
+                <subscopes anchored="true">
+                    <include syntax="tex" collection="optional" optional="true"/>
+                    <scope name="tex.bracket">
+                        <expression>\{</expression>
+                    </scope>
+                    <scope name="tex.heading.subsection.name" optional="true" spell-check="true">
+                        <expression>[^\{\}\\%\#]+</expression>
+                    </scope>
+                </subscopes>
+            </scope>
+            <scope name="tex.heading.subsubsection" spell-check="false">
+                <symbol type="heading">
+                    <context behavior="next" group="subsubsection" priority="60"/>
+                </symbol>
+                <starts-with>
+                    <expression>\\subsubsection</expression>
+                    <capture number="0" name="tex.keyword"/>
+                </starts-with>
+                <ends-with/>
+                <subscopes anchored="true">
+                    <include syntax="tex" collection="optional" optional="true"/>
+                    <scope name="tex.bracket">
+                        <expression>\{</expression>
+                    </scope>
+                    <scope name="tex.heading.subsubsection.name" optional="true" spell-check="true">
+                        <expression>[^\{\}\\%\#]+</expression>
+                    </scope>
+                </subscopes>
+            </scope>
+        </collection>
+    </collections>
+</syntax>
