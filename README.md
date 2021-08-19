@@ -1,6 +1,8 @@
-This extension provides syntax highlighting and autocompletion for **TeX** languages including **LaTeX** and **ConTeXt**.
+# TeX Suite for Nova.app
 
-## Language Support
+This [Nova](https://nova.app) extension provides syntax highlighting and autocompletion for **TeX** languages including **LaTeX** and **ConTeXt**.
+
+## Supported Features
 
 The following features are supported in plain **TeX**, **LaTeX** and **ConTeXt**:
 
@@ -43,6 +45,7 @@ You are welcome to do PRs for any of these.
 - Parse titles for ConTeXt \start\stop headings
 - in-Editor PDF preview (not sure if possible; I certainly won't do this since it requires doing more than just some XML definitions)
 - commands (not sure if helpful; the user can simply issue the desired command in a terminal view)
+- add auto-completions for math commands that are only suggested in math mode
 
 ## License
 

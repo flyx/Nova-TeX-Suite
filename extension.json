@@ -4,5 +4,8 @@
     "organization": "Felix Krause",
     "description": "Support for TeX, LaTeX and ConTeXt",
     "version": "0.1",
-    "categories": ["languages", "completions"]
+    "categories": ["languages", "completions"],
+    "bugs": "https://github.com/flyx/TeX.novaextension/issues",
+    "repository": "https://github.com/flyx/TeX.novaextension",
+    "license": "MIT"
 }
