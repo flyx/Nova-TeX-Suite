@@ -15,10 +15,10 @@
     
     <indentation>
         <increase>
-            <expression>\\if|\\else|\\start|\{|\[</expression>
+            <expression>^\s*((\\if|\\else)(?!.*\\fi)|\\start(?!.*\\stop)|\{(?!.*\})|\[(?!.*\])).*$</expression>
         </increase>
         <decrease>
-            <expression>\\fi|\\else|\\stop|\}|\]</expression>
+            <expression>^\s*(\\fi|\\else|\\stop|\}|\])</expression>
         </decrease>
     </indentation>
     
@@ -84,7 +84,7 @@
             </scope>
             <scope name="tex.environment.start" spell-check="false">
                 <symbol type="block" name-selector="tex.keyword.construct.name">
-                    <context behavior="start">
+                    <context behavior="start" group-by-name="true">
                         <auto-close string="\stop" completion="${name}" />
                     </context>
                 </symbol>

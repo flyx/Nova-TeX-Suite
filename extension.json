@@ -2,7 +2,7 @@
     "identifier": "org.flyx.tex",
     "name": "TeX Suite",
     "organization": "Felix Krause",
-    "description": "syntax support for TeX, LaTeX and ConTeXt",
-    "version": "1.0",
-    "categories": ["languages"]
+    "description": "Support for TeX, LaTeX and ConTeXt",
+    "version": "0.1",
+    "categories": ["languages", "completions"]
 }

@@ -2,16 +2,20 @@ This extension provides syntax highlighting and autocompletion for **TeX** langu
 
 ## Language Support
 
-The following features of plain **TeX** are supported:
+The following features are supported in plain **TeX**, **LaTeX** and **ConTeXt**:
 
 - syntax highlighting
 - spell checking
 - auto indentation
+- command completion suggestions
 
 In **LaTeX** and **ConTeXt** files, the following additional features are available:
 
-- auto-completion of \end commands (LaTeX) / \stop commands (ConTeXt) **BROKEN**
+- auto-completion of \end commands (LaTeX) / \stop commands (ConTeXt)
 - outlining document structure (chapter/section/etc), currently not for ConTeXt \start\stop variants
+- folding of environments (\begin / \end in LaTeX, \start / \stop in ConTeXt)
+- folding of document structure (\chapter, \section, etc)
+- environment name suggestions (for LaTeX; in ConTeXt environments are part of command completion)
 
 ## Remarks
 
@@ -28,6 +32,17 @@ Spell-checking excludes command and parameter names, but cannot fully distinguis
 
 The document structure only includes numbered headings, i.e. headings like `\section*` (LaTeX) or `\subject` (ConTeXt) are not shown.
 Heading titles are constructed from textual content until a command is encountered – so if your section title starts with `\textit`, the displayed title in the outline will be empty.
+
+## Possible improvements
+
+These are ideas, I do not necessarily plan to implement them.
+You are welcome to do PRs for any of these.
+
+- More autocompletion for LaTeX (environments & commands from popular packages)
+- automatically add structure for certain environments, e.g. second `{}` when selecting `tabular` environment.
+- Parse titles for ConTeXt \start\stop headings
+- in-Editor PDF preview (not sure if possible; I certainly won't do this since it requires doing more than just some XML definitions)
+- commands (not sure if helpful; the user can simply issue the desired command in a terminal view)
 
 ## License
 

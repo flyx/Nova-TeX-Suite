@@ -14,10 +14,10 @@
     
     <indentation>
         <increase>
-            <expression>\\if|\\else|\\begin|\{|\\columnbreak</expression>
+            <expression>^\s*((\\if|\\else)(?!.*\\fi)|\\begin(?!.*\\end)|\{(?!.*\})|\\columnbreak|\\item).*$</expression>
         </increase>
         <decrease>
-            <expression>\\fi|\\else|\\end|\}|\\columnbreak</expression>
+            <expression>^\s*(\\fi|\\else|\\end|\}|\\columnbreak|\\item)</expression>
         </decrease>
     </indentation>
     
@@ -46,7 +46,7 @@
     <collections>
         <collection name="environments">
             <scope name="tex.verbatim" spell-check="false">
-                <symbol type="tag" name-selector="tex.identifier.type">
+                <symbol type="block" name-selector="tex.identifier.type">
                     <context behavior="subtree"/>
                 </symbol>
                 <starts-with>
@@ -94,8 +94,8 @@
                 </subscopes>
             </scope>
             <scope name="tex.environment.begin" spell-check="false">
-                <symbol type="tag" name-selector="tex.identifier.type">
-                    <context behavior="start">
+                <symbol type="block" name-selector="tex.identifier.type">
+                    <context behavior="start" group-by-name="true">
                         <auto-close string="\end" completion="{${name}}" />
                     </context>
                 </symbol>
@@ -106,8 +106,8 @@
                 <capture number="4" name="tex.bracket"/>
             </scope>
             <scope name="tex.environment.end" spell-check="false">
-                <symbol type="tag" name-selector="tex.identifier.type">
-                    <context behavior="end"/>
+                <symbol type="block" name-selector="tex.identifier.type">
+                    <context behavior="end" group-by-name="true"/>
                 </symbol>
                 <expression>(\\end)(\{)(.*?)(\})</expression>
                 <capture number="1" name="tex.keyword.construct"/>
