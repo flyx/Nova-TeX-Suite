@@ -19,6 +19,16 @@ In **LaTeX** and **ConTeXt** files, the following additional features are availa
 - folding of document structure (\chapter, \section, etc)
 - environment name suggestions (for LaTeX; in ConTeXt environments are part of command completion)
 
+### Building and viewing the PDF
+
+This extension provides a task template for building your PDF file via [latexmk](http://personal.psu.edu/~jcc8/software/latexmk/).
+It provides minimal configuration since latexmk supports RC files for that.
+You need to create a task in your *Project Settings* from the template in order to use it.
+After you created the task, you can use Nova's *build* button to build your PDF.
+
+After successful creation, you can open your PDF in Nova.
+However, mind that Nova's PDF viewer does not update when you rebuild your PDF, so I recommend opening the PDF in Preview instead which does refresh when rebuilt.
+
 ## Remarks
 
 Syntax highlighting is and can only be best effort.
@@ -34,6 +44,8 @@ Spell-checking excludes command and parameter names, but cannot fully distinguis
 
 The document structure only includes numbered headings, i.e. headings like `\section*` (LaTeX) or `\subject` (ConTeXt) are not shown.
 Heading titles are constructed from textual content until a command is encountered – so if your section title starts with `\textit`, the displayed title in the outline will be empty.
+
+There is an issue matcher defined for lualatex output, however it does not work for unknown reasons.
 
 ## Possible improvements
 
