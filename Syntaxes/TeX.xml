@@ -83,11 +83,8 @@
             </scope>
         </collection>
         <collection name="symbols">
-            <scope name="tex.value.number" spell-check="false">
-                <expression>(\d+|\d*\.\d+)(pt|mm|cm|in|ex|em|bp|pc|dd|cc|nd|nc|sp)?</expression>
-            </scope>
             <scope name="tex.bracket">
-                <expression>[\{\}\[\]]</expression>
+                <expression>[\{\}]</expression>
             </scope>
             <scope name="tex.operator">
                 <expression>[&amp;_\^~]</expression>

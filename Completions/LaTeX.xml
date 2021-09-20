@@ -237,6 +237,7 @@
 		<completion string="table" />
 		<completion string="list" />
 		<completion string="description" />
+		<completion string="document" />
 		<completion string="enumerate" />
 		<completion string="itemize" />
 		<completion string="math" />

@@ -41,6 +41,27 @@
         <include syntax="tex" collection="simple"/>
         <include syntax="tex" collection="optional"/>
         <include syntax="tex" collection="symbols"/>
+        <scope name="tex.url" spell-check="false">
+            <starts-with>
+                <expression>(\\url|\\href)(\{)</expression>
+                <capture number="1" name="tex.keyword"/>
+                <capture number="2" name="tex.bracket"/>
+            </starts-with>
+            <ends-with>
+                <expression>\}</expression>
+                <capture number="0" name="tex.bracket"/>
+            </ends-with>
+            <subscopes>
+              <include syntax="self" collection="math"/>
+              <include syntax="self" collection="environments"/>
+              <include syntax="tex" collection="headings"/>
+              <include syntax="tex" collection="simple"/>
+              <include syntax="tex" collection="symbols"/>
+              <cut-off>
+                <expression>(?=\n)</expression>
+              </cut-off>
+            </subscopes>
+        </scope>
     </scopes>
     
     <collections>
