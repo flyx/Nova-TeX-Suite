@@ -3,7 +3,7 @@
     "name": "TeX Suite",
     "organization": "Felix Krause",
     "description": "Support for TeX, LaTeX and ConTeXt",
-    "version": "0.1",
+    "version": "0.2",
     "categories": ["languages", "completions"],
     "bugs": "https://github.com/flyx/TeX.novaextension/issues",
     "repository": "https://github.com/flyx/TeX.novaextension",
