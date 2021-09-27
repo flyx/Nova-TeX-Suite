@@ -8,6 +8,18 @@
     "bugs": "https://github.com/flyx/TeX.novaextension/issues",
     "repository": "https://github.com/flyx/TeX.novaextension",
     "license": "MIT",
+    "issueMatchers": {
+        "latex-error": {
+            "pattern": {
+                "regexp": "^(\\.[^\\s:]+):(\\d+):\\s+(.*)$",
+                "message": 3,
+                "file": 1,
+                "line": 2,
+                "severity": "error",
+                "loop": false
+            }
+        }
+    },
     "taskTemplates": {
         "latexmk": {
             "name": "latexmk",
@@ -23,9 +35,14 @@
                 {
                     "key": "tex.latex.processor",
                     "title": "LaTeX processor",
-                    "description": "The LaTeX processor that should be used for building your PDF. Leave empty to let latexmk decide from available RC files.",
+                    "description": "The LaTeX processor that should be used for building your PDF.",
                     "type": "enum",
-                    "values": ["-pdflatex", "-xelatex", "-lualatex", ""],
+                    "values": [
+                        ["-pdflatex", "pdfLaTeX"],
+                        ["-xelatex", "XeLaTeX"],
+                        ["-lualatex", "LuaLaTeX"],
+                        ["", "Let latexmk choose"]
+                    ],
                     "default": ""
                 }
             ],
@@ -34,22 +51,59 @@
                     "shell": true,
                     "command": "latexmk",
                     "args": [
+                        "-interaction=nonstopmode",
+                        "-file-line-error",
                         "-cd",
                         "$(Config:tex.latex.processor)",
                         "$(Config:tex.latex.mainfile)"
                     ],
-                    "matchers": [
-                        {
-                            "pattern": {
-                                "regexp": "(?<=\\n)\\((?>([^\\)\\n]+))((?>[^\\(\\)\\n]|\\n(?!\\!)|\\((?2)\\))+)*?\\n!\\s*([^\\n]*)\\nl\\.(\\d+)\\s+([^\\n]*)",
-                                "message": 3,
-                                "file": 1,
-                                "line": 4,
-                                "severity": "error",
-                                "loop": true
-                            }
-                        }
-                    ]
+                    "matchers": ["latex-error"]
+                }
+            }
+        },
+        "latexmk-synctex": {
+            "name": "latexmk-synctex",
+            "description": "Continuously run latexmk, open resulting PDF in Skim for live updates and SyncTeX support",
+            "persistent": true,
+            "config": [
+                {
+                    "key": "tex.latex.mainfile",
+                    "title": "Main file",
+                    "description": "The file latexmk should be called upon",
+                    "type": "path"
+                },
+                {
+                    "key": "tex.latex.processor",
+                    "title": "LaTeX processor",
+                    "description": "The LaTeX processor that should be used for building your PDF.",
+                    "type": "enum",
+                    "values": [
+                        ["-pdflatex", "pdfLaTeX"],
+                        ["-xelatex", "XeLaTeX"],
+                        ["-lualatex", "LuaLaTeX"],
+                        ["", "Let latexmk choose"]
+                    ],
+                    "default": ""
+                }
+            ],
+            "tasks": {
+                "run": {
+                    "shell": false,
+                    "command": "/usr/bin/env",
+                    "args": [
+                        "latexmk",
+                        "-interaction=nonstopmode",
+                        "-file-line-error",
+                        "-synctex=1",
+                        "-e",
+                        "\\$mypdffile = \"$(Config:tex.latex.mainfile)\";\n\\$mypdffile =~ s/tex\\$/pdf/;\n\\$pdf_previewer = \"osascript -e 'set theFile to POSIX file \\\\\"\\$mypdffile\\\\\" as alias' -e 'tell application \\\\\"Skim\\\\\"' -e 'set theDocs to get documents whose path is (get POSIX path of theFile)' -e 'if (count of theDocs) > 0 then revert theDocs' -e 'open theFile' -e 'end tell'\"; \\$pdf_update_method = 4; \\$pdf_update_command = \\$pdf_previewer;",
+                        "-pvc",
+                        "-pdf",
+                        "-cd",
+                        "$(Config:tex.latex.processor)",
+                        "$(Config:tex.latex.mainfile)"
+                    ],
+                    "matchers": ["latex-error"]
                 }
             }
         }
