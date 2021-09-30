@@ -20,7 +20,9 @@
     </indentation>
     
     <comments>
-        <single>%</single>
+        <single>
+            <expression>%</expression>
+        </single>
     </comments>
     
     <brackets>
