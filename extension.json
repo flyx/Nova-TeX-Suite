@@ -8,10 +8,23 @@
     "bugs": "https://github.com/flyx/TeX.novaextension/issues",
     "repository": "https://github.com/flyx/TeX.novaextension",
     "license": "MIT",
+    "main": "main.js",
+    "entitlements": {
+        "process": true,
+        "filesystem": "readwrite"
+    },
+    "commands": {
+        "extensions": [
+            {
+                "title": "Show Skim Setup Instructions",
+                "command": "org.flyx.tex.skim-setup"
+            }
+        ]
+    },
     "issueMatchers": {
-        "latex-error": {
+        "org.flyx.tex.error": {
             "pattern": {
-                "regexp": "^(\\.[^\\s:]+):(\\d+):\\s+(.*)$",
+                "regexp": "^([^\\s:]+):(\\d+):\\s+(.*)$",
                 "message": 3,
                 "file": 1,
                 "line": 2,
@@ -24,7 +37,6 @@
         "latexmk": {
             "name": "latexmk",
             "description": "Builds the PDF via latexmk. Supports auto-update & preview with Skim via run button.",
-            "persistent": false,
             "config": [
                 {
                     "key": "tex.latex.mainfile",
@@ -58,25 +70,12 @@
                         "$(Config:tex.latex.processor)",
                         "$(Config:tex.latex.mainfile)"
                     ],
-                    "matchers": ["latex-error"]
+                    "matchers": ["org.flyx.tex.error"]
                 },
                 "run": {
-                    "shell": false,
-                    "command": "/usr/bin/env",
-                    "args": [
-                        "latexmk",
-                        "-interaction=nonstopmode",
-                        "-file-line-error",
-                        "-synctex=1",
-                        "-e",
-                        "\\$mypdffile = \"$(Config:tex.latex.mainfile)\";\n\\$mypdffile =~ s/tex\\$/pdf/;\n\\$pdf_previewer = \"osascript -e 'set theFile to POSIX file \\\\\"\\$mypdffile\\\\\" as alias' -e 'tell application \\\\\"Skim\\\\\"' -e 'set theDocs to get documents whose path is (get POSIX path of theFile)' -e 'if (count of theDocs) > 0 then revert theDocs' -e 'open theFile' -e 'end tell'\"; \\$pdf_update_method = 4; \\$pdf_update_command = \\$pdf_previewer;",
-                        "-pvc",
-                        "-pdf",
-                        "-cd",
-                        "$(Config:tex.latex.processor)",
-                        "$(Config:tex.latex.mainfile)"
-                    ],
-                    "matchers": ["latex-error"]
+                    "resolve": "org.flyx.tex.tasks",
+                    "persistent": true,
+                    "buildBeforeRunning": false
                 }
             }
         },

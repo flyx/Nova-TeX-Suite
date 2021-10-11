@@ -19,21 +19,28 @@ This [Nova](https://nova.app) extension provides syntax highlighting and autocom
 
 ### Building and viewing the PDF
 
-You need [latexmk](http://personal.psu.edu/~jcc8/software/latexmk/) which should come with your TeX distribution.
-For viewing the document, you need [Skim](https://skim-app.sourceforge.io) because that supports SyncTeX (unlike Preview).
+You will need a TeX distribution installed on your system.
+This extension has been tested and is known to work with [MacTeX](https://www.tug.org/mactex/).
+In particular, it uses [latexmk](http://personal.psu.edu/~jcc8/software/latexmk/) to build the document.
+
+For viewing the document, you need the PDF viewer [Skim](https://skim-app.sourceforge.io) which, unlike Preview, supports SyncTeX.
 
 - Go to *Project Settings* and create a new task from the `latexmk` template.
 - Enter the path to the main `.tex` file.
+  Optionally set the LaTeX processor.
 - close settings, select the created task in Nova's title bar if a different task is currently active.
 
 The *build* and *run* buttons in the title bar should now be enabled:
 
 - *build* runs `latexmk` on your project; in the case of an error, Nova will show an issue for the corresponding file.
-  If you use Skim to view your file, you may configure it to auto-update. **Do not do this when using the *run* command (see below)**.
-- *run* runs `latexmk` in continuous preview mode and opens Skim to show the resulting PDF file.
-  In this mode, editing any file of the project will automatically rebuild the PDF and Skim will refresh when the PDF is ready.
-  This mode tells Skim automatically to update when PDF generation has finished – which means that **you must deactivate Skim's option to check for file changes**.
-  SyncTeX support is currently TODO.
+  This will build the PDF in the project's directory and dump all intermediate files there.
+- *run* starts Skim as child process to display and continuously update your PDF file there.
+  While Skim is running, saving any LaTeX file of the project will automatically rebuild the PDF and tell Skim to refresh.
+  **You must deactivate Skim's option to check for file changes when using this feature**.
+  In Skim, you can `⌘⇧`+Click to jump to the source position of the content that has been clicked after you've followed the instructions in the menu *Extensions -> Show Skim Setup Instructions*.
+
+It is recommended to position Nova and Skim side-by-side to use the continuous preview mode.
+The extension will not do any window arrangement for you.
 
 ## Remarks
 
@@ -52,17 +59,21 @@ The document structure only includes numbered headings, i.e. headings like `\sec
 Heading titles are constructed from textual content until a command is encountered – so if your section title starts with `\textit`, the displayed title in the outline will be empty.
 
 Skim is used for showing a PDF because that is the only way SyncTeX support can realistically be provided.
-Also, the extension API seems not to be built to provide something as complex as an in-editor PDF preview.
+It is very unlikely that this will ever be an in-editor view.
 
-## Possible improvements
+## Possible improvements & missing features
 
 These are ideas, I do not necessarily plan to implement them.
 You are welcome to do PRs for any of these.
 
-- More autocompletion for LaTeX (environments & commands from popular packages)
+- more autocompletion for LaTeX (environments & commands from popular packages)
 - automatically add structure for certain environments, e.g. second `{}` when selecting `tabular` environment.
-- Parse titles for ConTeXt \start\stop headings
+- parse titles for ConTeXt \start\stop headings
 - add auto-completions for math commands that are only suggested in math mode
+- forward navigation in continuous preview mode (e.g. click on source, navigate to position in PDF – Skim provides an API for this, so it is doable)
+- continuous preview for ConTeXt
+- automatically recognize `.latexmkrc` file in the project home and auto-generate a task for it
+- once Nova has an API available for setting the active editor, do away with the horrible AppleScript.
 
 ## License
 
