@@ -17,7 +17,7 @@ This [Nova](https://nova.app) extension provides syntax highlighting and autocom
 - environment name suggestions (LaTeX)
 - tasks for building and viewing the resulting PDF via `latexmk` (LaTeX)
 
-### Building and viewing the PDF
+### Building and Viewing the PDF
 
 You will need a TeX distribution installed on your system.
 This extension has been tested and is known to work with [MacTeX](https://www.tug.org/mactex/).
@@ -61,7 +61,7 @@ Heading titles are constructed from textual content until a command is encounter
 Skim is used for showing a PDF because that is the only way SyncTeX support can realistically be provided.
 It is very unlikely that this will ever be an in-editor view.
 
-## Possible improvements & missing features
+## Possible Improvements & Missing Features
 
 These are ideas, I do not necessarily plan to implement them.
 You are welcome to do PRs for any of these.
@@ -78,3 +78,8 @@ You are welcome to do PRs for any of these.
 ## License
 
 MIT
+
+## Support this Project
+
+If you like this project and want to give something back, you can check out GitHub's *Sponsor* button to the right.
+This is just an option I provide, not something I request you to do, and I will never nag about it.
