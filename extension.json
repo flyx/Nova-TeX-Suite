@@ -60,17 +60,7 @@
             ],
             "tasks": {
                 "build": {
-                    "shell": false,
-                    "command": "/usr/bin/env",
-                    "args": [
-                        "latexmk",
-                        "-interaction=nonstopmode",
-                        "-file-line-error",
-                        "-cd",
-                        "$(Config:tex.latex.processor)",
-                        "$(Config:tex.latex.mainfile)"
-                    ],
-                    "matchers": ["org.flyx.tex.error"]
+                    "resolve": "org.flyx.tex.tasks"
                 },
                 "run": {
                     "resolve": "org.flyx.tex.tasks",
