@@ -15,7 +15,8 @@ class ProcWrapper {
 }
 
 // parse LaTeX issues from the LaTeX output given at log_path.
-function parseIssues(log_path) {
+function parseIssues(log_path, working_dir, preview_mode) {
+	if (!nova.path.isAbsolute(log_path)) log_path = nova.path.join(working_dir, log_path);
 	const log = nova.fs.open(log_path);
 	const regex = /^([^\s:]+):(\d+):\s+(.*)$/;
 	let cur_issue = null;
@@ -63,8 +64,10 @@ function parseIssues(log_path) {
 		console.log("issues exist for " + path);
 		if (nova.path.isAbsolute(path)) {
 			tex_suite.issues.set(encodeURI(`file://${path}`), issue_list);
-		} else {
+		} else if (preview_mode) {
 			tex_suite.issues.set(encodeURI(`file://${nova.path.join(tex_suite.getSkimPreview().workspace.path, path)}`), issue_list);
+		} else {
+			tex_suite.issues.set(encodeURI(`file://${nova.path.join(working_dir, path)}`), issue_list);
 		}
 	}
 }
@@ -79,49 +82,55 @@ class Latexmk {
 	// if preview_mode is given, notifications will be issued and Skim will be brought
 	// to the foreground when latexmk is done.
 	run(preview_mode) {
-		const skim_preview = tex_suite.getSkimPreview();
-		if (preview_mode) {
-			if (skim_preview.opened) {
-				tex_suite.previewNotify("updating document with latexmk…", "I'll notify you when I'm ready");
-			} else {
-				tex_suite.previewNotify("creating document with latexmk…", "Document will open when ready, please wait…");
+		return new Promise((resolve, reject) => {
+			const skim_preview = tex_suite.getSkimPreview();
+			if (preview_mode) {
+				if (skim_preview.opened) {
+					tex_suite.previewNotify("updating document with latexmk…", "I'll notify you when I'm ready");
+				} else {
+					tex_suite.previewNotify("creating document with latexmk…", "Document will open when ready, please wait…");
+				}
 			}
-		}
-		let latexmk_proc = new ProcWrapper("/bin/sh", {
-			args: [nova.path.join(nova.extension.path, "Scripts", "run_latexmk.sh"), this.working_dir,
-			       preview_mode ? "true" : "false", this.processor, this.source_file]
-		});
-		let refer_to_path = null;
-		latexmk_proc.onStderr((line) => {
-			let str = line.trim();
-			if (str.startsWith("Refer to '")) {
-				refer_to_path = str.substr(10, str.lastIndexOf("'") - 10);
-			}
-		});
-		latexmk_proc.onDidExit((status) => {
-			if (status == 0) {
-				if (preview_mode) {
-					if (!skim_preview.opened) {
-						applescript.activateApp("Skim");
-						skim_preview.opened = true;
-						tex_suite.previewNotifyDismiss();
-					} else {
-						tex_suite.previewNotify("Document ready", "Latexmk updated the document");
+			let latexmk_proc = new ProcWrapper("/bin/sh", {
+				args: [nova.path.join(nova.extension.path, "Scripts", "run_latexmk.sh"), this.working_dir,
+				       preview_mode ? "true" : "false", this.processor, this.source_file]
+			});
+			let refer_to_path = null;
+			latexmk_proc.onStderr((line) => {
+				let str = line.trim();
+				if (str.startsWith("Refer to '")) {
+					refer_to_path = str.substr(10, str.lastIndexOf("'") - 10);
+				} else console.log(line);
+			});
+			latexmk_proc.onDidExit((status) => {
+				nova.subscriptions.remove(latexmk_proc);
+				if (status == 0) {
+					if (preview_mode) {
+						if (!skim_preview.opened) {
+							applescript.activateApp("Skim");
+							skim_preview.opened = true;
+							tex_suite.previewNotifyDismiss();
+						} else {
+							tex_suite.previewNotify("Document ready", "Latexmk updated the document");
+						}
 					}
 					console.log("latexmk successful!");
+					resolve(null);
+				} else if (refer_to_path != null) {
+					console.log("latexmk failed, see log " + refer_to_path);
+					parseIssues(refer_to_path, this.working_dir, preview_mode);
+					tex_suite.previewNotify("Latexmk encountered problems", "See the Issues Sidebar for the list of errors");
+					reject(refer_to_path);
+				} else {
+					console.warn("latexmk failed, but gave no path to a log file!");
+					tex_suite.previewNotify("Latexmk failed unexpectedly", "no error log available (this should not happen)");
+					reject(null);
 				}
-			} else if (refer_to_path != null) {
-				console.log("latexmk failed, see log " + refer_to_path);
-				parseIssues(refer_to_path);
-				tex_suite.previewNotify("Latexmk encountered problems", "See the Issues Sidebar for the list of errors");
-			} else {
-				console.warn("latexmk failed, but gave no path to a log file!");
-				tex_suite.previewNotify("Latexmk failed unexpectedly", "no error log available (this should not happen)");
-			}
+			});
+			latexmk_proc.start();
+			// ensure latexmk_proc is not garbage collected before it ends
+			nova.subscriptions.add(latexmk_proc);
 		});
-		latexmk_proc.start();
-		// ensure latexmk_proc is not garbage collected before it ends
-		nova.subscriptions.add(latexmk_proc);
 	}
 }
 

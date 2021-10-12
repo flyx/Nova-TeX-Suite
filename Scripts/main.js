@@ -32,22 +32,20 @@ nova.assistants.registerTaskAssistant({
 		}
 		return null;
 	},
-	resolveTaskAction: function(context) {		
+	resolveTaskAction: function(context) {
+		const processor = context.config.get("tex.latex.processor") || "";
+		const mainfile = context.config.get("tex.latex.mainfile") || "";
 		if (context.action == "build") {
-			return new TaskProcessAction("/usr/bin/env", {
-				"args": [
-						"latexmk",
-						"-interaction=nonstopmode",
-						"-file-line-error",
-						"-cd",
-						context.config.get("tex.latex.processor") || "",
-						context.config.get("tex.latex.mainfile") || ""
-				],
-				"matchers": ["org.flyx.tex.error"]
+			let latexmk = new Latexmk(nova.workspace.path, processor, mainfile);
+			return latexmk.run(false).then(() => {
+				return new TaskProcessAction("/usr/bin/true", {args: []});
+			}).catch((log_file) => {
+				if (log_file == null) return null; // should never happen
+				return new TaskProcessAction("/bin/sh", {
+					args: [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), log_file]
+				});
 			});
 		} else if (context.action == "run") {
-			const processor = context.config.get("tex.latex.processor") || "";
-			const mainfile = context.config.get("tex.latex.mainfile") || "";
 			const my_workspace = nova.workspace;
 			return skim.setupTmpDir().then((tmp_dir) => {
 				const skim_preview = new skim.Preview(tmp_dir, processor, mainfile, my_workspace);
