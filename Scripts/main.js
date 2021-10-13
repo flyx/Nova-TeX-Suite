@@ -82,7 +82,6 @@ nova.assistants.registerTaskAssistant({
 			return contextGenerator.run("workspace").then(() => {
 				return new TaskProcessAction("/usr/bin/true", {args: []});
 			}).catch((log_file) => {
-				// TODO: properly implement this
 				if (log_file == null) return null; // should never happen
 				return new TaskProcessAction("/bin/sh", {
 					args: [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), log_file]
@@ -96,7 +95,7 @@ nova.assistants.registerTaskAssistant({
 				return skim_preview.action();
 			});
 		} else if (context.action == Task.Clean) {
-			return Latexmk.cleanProcess();
+			return Context.cleanProcess();
 		}
 	}
 }, {identifier: "org.flyx.tex.tasks.context"});

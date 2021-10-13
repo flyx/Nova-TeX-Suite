@@ -1,3 +1,18 @@
+## Version 0.4.0
+
+LaTeX:
+
+- Can clean via latexmk.
+- auto-generate task from `[.]latexmkrc` file, if one exists.
+
+ConTeXt:
+
+- implemented task template similar to latexmk, including build, preview and clean support
+
+All:
+
+- automatically open Issues Sidebar when an error is encountered during building / running.
+
 ## Version 0.3.1
 
 Updated Changelog. whoops :)

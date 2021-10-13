@@ -86,6 +86,12 @@ class Context {
 			nova.subscriptions.add(context_proc);
 		});
 	}
+	
+	static cleanProcess() {
+		return new TaskProcessAction("/usr/bin/env", {
+			args: ["context", "--purge"]
+		});
+	}
 }
 
 exports.Context = Context;
