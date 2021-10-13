@@ -2,17 +2,7 @@
 
 const applescript = require("applescript.js");
 const tex_suite = require("tex_suite.js");
-
-class ProcWrapper {
-	constructor(name, options) {
-		this.proc = new Process(name, options);
-	}
-	start() {this.proc.start();}
-	onStdout(f) {this.proc.onStdout(f);}
-	onStderr(f) {this.proc.onStderr(f);}
-	onDidExit(f) {this.proc.onDidExit(f);}
-	dispose() {this.proc.terminate();}
-}
+const ProcWrapper = require("helpers.js").ProcWrapper;
 
 // parse LaTeX issues from the LaTeX output given at log_path.
 function parseIssues(log_path, working_dir, preview_mode) {

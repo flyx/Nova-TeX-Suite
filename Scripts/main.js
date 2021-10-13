@@ -1,6 +1,7 @@
 const tex_suite = require("tex_suite.js");
 const applescript = require("applescript.js");
 const Latexmk = require("latexmk.js").Latexmk;
+const Context = require("context.js").Context;
 const skim = require("skim.js");
 
 exports.activate = () => tex_suite.activate();
@@ -8,12 +9,11 @@ exports.deactivate = () => tex_suite.deactivate();
 
 nova.commands.register("org.flyx.tex.skim-setup", (workspace) => tex_suite.displaySkimSetup());
 
-nova.assistants.registerIssueAssistant(["tex", "latex"], {
+nova.assistants.registerIssueAssistant(["tex", "latex", "context"], {
 	provideIssues: function(editor) {
 		const skim_preview = tex_suite.getSkimPreview();
 		if (skim_preview == null) return [];
-		const latexmk = new Latexmk(skim_preview.tmp_dir, skim_preview.processor, skim_preview.source_path);
-		latexmk.run("preview");
+		skim_preview.regenerate();
     return [];
 	}
 }, {event: "onSave"});
@@ -63,13 +63,40 @@ nova.assistants.registerTaskAssistant({
 		} else if (context.action == Task.Run) {
 			const my_workspace = nova.workspace;
 			return skim.setupTmpDir().then((tmp_dir) => {
-				const skim_preview = new skim.Preview(tmp_dir, processor, mainfile, my_workspace);
-				const latexmk = new Latexmk(tmp_dir, processor, mainfile);
-				latexmk.run("preview");
+				const skim_preview = new skim.Preview(tmp_dir, new Latexmk(tmp_dir, processor, mainfile), my_workspace);
+				skim_preview.regenerate();
 				return skim_preview.action();
 			});
 		} else if (context.action == Task.Clean) {
 			return Latexmk.cleanProcess();
 		}
 	}
-}, {identifier: "org.flyx.tex.tasks"});
+}, {identifier: "org.flyx.tex.tasks.latexmk"});
+
+nova.assistants.registerTaskAssistant({
+	provideTasks: function() { return null; },
+	resolveTaskAction: function(context) {
+		const mainfile = context.config.get("tex.context.mainfile") || "";
+		if (context.action == Task.Build) {
+			let contextGenerator = new Context(nova.workspace.path, mainfile);
+			return contextGenerator.run("workspace").then(() => {
+				return new TaskProcessAction("/usr/bin/true", {args: []});
+			}).catch((log_file) => {
+				// TODO: properly implement this
+				if (log_file == null) return null; // should never happen
+				return new TaskProcessAction("/bin/sh", {
+					args: [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), log_file]
+				});
+			});
+		} else if (context.action == Task.Run) {
+			const my_workspace = nova.workspace;
+			return skim.setupTmpDir().then((tmp_dir) => {
+				const skim_preview = new skim.Preview(tmp_dir, new Context(tmp_dir, mainfile), my_workspace);
+				skim_preview.regenerate();
+				return skim_preview.action();
+			});
+		} else if (context.action == Task.Clean) {
+			return Latexmk.cleanProcess();
+		}
+	}
+}, {identifier: "org.flyx.tex.tasks.context"});

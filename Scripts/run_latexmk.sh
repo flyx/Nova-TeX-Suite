@@ -17,7 +17,6 @@ read -r -d '' PERL_SCRIPT <<'EOF' || true
 $pdf_previewer =
 	"osascript -e 'set theFile to POSIX file (\"$dir/\" & %R & \".pdf\") as alias'" .
 					 " -e 'tell application \"Skim\"'" .
-					 " -e   'revert documents'" .
 					 " -e   'set theDocs to get documents whose path is (get POSIX path of theFile)'" .
 					 " -e   'if (count of theDocs) > 0 then'" .
 					 " -e     'revert theDocs'" .

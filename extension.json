@@ -60,18 +60,43 @@
             ],
             "tasks": {
                 "build": {
-                    "resolve": "org.flyx.tex.tasks",
+                    "resolve": "org.flyx.tex.tasks.latexmk",
                     "data": "template"
                 },
                 "run": {
-                    "resolve": "org.flyx.tex.tasks",
+                    "resolve": "org.flyx.tex.tasks.latexmk",
                     "data": "template",
                     "persistent": true,
                     "buildBeforeRunning": false
                 },
                 "clean": {
-                    "resolve": "org.flyx.tex.tasks",
+                    "resolve": "org.flyx.tex.tasks.latexmk",
                     "data": "template"
+                }
+            }
+        },
+        "context": {
+            "name": "context",
+            "description": "Builds the PDF with context. Supports auto-update & preview with Skim via run button.",
+            "config": [
+                {
+                    "key": "tex.context.mainfile",
+                    "title": "Main file",
+                    "description": "The file context should be called upon",
+                    "type": "path"
+                }
+            ],
+            "tasks": {
+                "build": {
+                    "resolve": "org.flyx.tex.tasks.context"
+                },
+                "run": {
+                    "resolve": "org.flyx.tex.tasks.context",
+                    "persistent": true,
+                    "buildBeforeRunning": false
+                },
+                "clean": {
+                    "resolve": "org.flyx.tex.tasks.context"
                 }
             }
         }

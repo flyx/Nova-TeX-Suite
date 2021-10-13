@@ -14,11 +14,10 @@ function gotoLine(editor, line) {
 }
 
 class Preview {
-	constructor(tmp_dir, processor, source_path, workspace) {
-		this.source_path = source_path;
+	constructor(tmp_dir, generator, workspace) {
+		this.generator = generator;
 		this.workspace = workspace;
 		this.tmp_dir = tmp_dir;
-		this.processor = processor;
 		this.opened = false;
 		this.navigate = new Process("/bin/cat", {
 			args: [nova.path.join(tmp_dir, "nova_in.fifo")]
@@ -67,6 +66,10 @@ class Preview {
 		return new TaskProcessAction("/bin/sh", {
 			args: [nova.path.join(nova.extension.path, "Scripts", "skim_preview.sh"), this.tmp_dir]
 		});
+	}
+	
+	regenerate() {
+		this.generator.run("preview");
 	}
 }
 

@@ -15,14 +15,19 @@ This [Nova](https://nova.app) extension provides syntax highlighting and autocom
 - folding of `\begin` / `\end` (LaTeX)
 - folding of `\start` / `\stop` (ConTeXt)
 - environment name suggestions (LaTeX)
-- tasks for building and viewing the resulting PDF via `latexmk` (LaTeX)
+- tasks for building and live PDF preview (ConTeXt, LaTeX via `latexmk`)
 
-### Building and Viewing the PDF
+## Building and Viewing the PDF
+
+For viewing the document, you need the PDF viewer [Skim](https://skim-app.sourceforge.io) which, unlike Preview, supports SyncTeX.
+It is recommended to position Nova and Skim side-by-side to use the continuous preview mode.
+The PDF view does not integrate into the Nova window.
+
+### LaTeX
 
 You will need a TeX distribution installed on your system.
 This extension has been tested and is known to work with [MacTeX](https://www.tug.org/mactex/).
 In particular, it uses [latexmk](http://personal.psu.edu/~jcc8/software/latexmk/) to build the document.
-For viewing the document, you need the PDF viewer [Skim](https://skim-app.sourceforge.io) which, unlike Preview, supports SyncTeX.
 
 If your workspace contains a `latexmkrc` or `.latexmkrc` file, a task will automatically be created for it.
 At the very minimum, your `[.]latexmkrc` file should take care of the following:
@@ -33,7 +38,7 @@ At the very minimum, your `[.]latexmkrc` file should take care of the following:
 Alternatively, you can create a task from the `latexmk` template in which you explicitly give the file to be processed and the processor to be used – this can be done in the *Project Settings*.
 You should not use the *Let latexmk choose* processor option unless a `latexmkrc` file exists that sets `$pdf_mode`.
 
-Once you have a task, the *build* and *run* operations become available:
+Once you have a task, the Project's *build*, *run* and *clean* operations become available:
 
 - *build* runs `latexmk` on your project; in the case of an error, Nova will show an issue for the corresponding file.
   This will build the PDF in the project's directory and dump all intermediate files there.
@@ -42,8 +47,15 @@ Once you have a task, the *build* and *run* operations become available:
   **You must deactivate Skim's option to check for file changes when using this feature**.
   To enable backwards navigation, follow the instructions available in the Nova menu *Extensions -> Show Skim Setup Instructions*.
   When that is done, you can `⌘⇧`+Click in Skim to jump to the source position of the content that has been clicked.
+- *clean* does a `latexmk -c`.
 
-It is recommended to position Nova and Skim side-by-side to use the continuous preview mode.
+### ConTeXt
+
+For building and live preview of a ConTeXt project, you have to create a task from the `context` template in *Project Settings*.
+You need to tell the task your primary `.tex` file that should be compiled.
+
+Afterwards, *build*, *run* and *clean* become available similar to how they work with LaTeX as described above.
+Currently, Skim will not do backwards navigation from a ConTeXt-created PDF, it is unclear why this doesn't work.
 
 ## Remarks
 
