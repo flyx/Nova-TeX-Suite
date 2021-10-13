@@ -22,25 +22,28 @@ This [Nova](https://nova.app) extension provides syntax highlighting and autocom
 You will need a TeX distribution installed on your system.
 This extension has been tested and is known to work with [MacTeX](https://www.tug.org/mactex/).
 In particular, it uses [latexmk](http://personal.psu.edu/~jcc8/software/latexmk/) to build the document.
-
 For viewing the document, you need the PDF viewer [Skim](https://skim-app.sourceforge.io) which, unlike Preview, supports SyncTeX.
 
-- Go to *Project Settings* and create a new task from the `latexmk` template.
-- Enter the path to the main `.tex` file.
-  Optionally set the LaTeX processor.
-- close settings, select the created task in Nova's title bar if a different task is currently active.
+If your workspace contains a `latexmkrc` or `.latexmkrc` file, a task will automatically be created for it.
+At the very minimum, your `[.]latexmkrc` file should take care of the following:
 
-The *build* and *run* buttons in the title bar should now be enabled:
+- If there are multiple `.tex` files directly in your workspace, `@default_files` must be set so that latexmk knows which files to compile.
+- If you want to use live preview, you must set `$pdf_mode` to something other than `0` so that a PDF is generated.
+
+Alternatively, you can create a task from the `latexmk` template in which you explicitly give the file to be processed and the processor to be used – this can be done in the *Project Settings*.
+You should not use the *Let latexmk choose* processor option unless a `latexmkrc` file exists that sets `$pdf_mode`.
+
+Once you have a task, the *build* and *run* operations become available:
 
 - *build* runs `latexmk` on your project; in the case of an error, Nova will show an issue for the corresponding file.
   This will build the PDF in the project's directory and dump all intermediate files there.
 - *run* starts Skim as child process to display and continuously update your PDF file there.
   While Skim is running, saving any LaTeX file of the project will automatically rebuild the PDF and tell Skim to refresh.
   **You must deactivate Skim's option to check for file changes when using this feature**.
-  In Skim, you can `⌘⇧`+Click to jump to the source position of the content that has been clicked after you've followed the instructions in the menu *Extensions -> Show Skim Setup Instructions*.
+  To enable backwards navigation, follow the instructions available in the Nova menu *Extensions -> Show Skim Setup Instructions*.
+  When that is done, you can `⌘⇧`+Click in Skim to jump to the source position of the content that has been clicked.
 
 It is recommended to position Nova and Skim side-by-side to use the continuous preview mode.
-The extension will not do any window arrangement for you.
 
 ## Remarks
 
@@ -72,7 +75,6 @@ You are welcome to do PRs for any of these.
 - add auto-completions for math commands that are only suggested in math mode
 - forward navigation in continuous preview mode (e.g. click on source, navigate to position in PDF – Skim provides an API for this, so it is doable)
 - continuous preview for ConTeXt
-- automatically recognize `.latexmkrc` file in the project home and auto-generate a task for it
 - once Nova has an API available for setting the active editor, do away with the horrible AppleScript.
 
 ## License

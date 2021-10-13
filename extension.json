@@ -55,15 +55,17 @@
                         ["-lualatex", "LuaLaTeX"],
                         ["", "Let latexmk choose"]
                     ],
-                    "default": ""
+                    "default": "-lualatex"
                 }
             ],
             "tasks": {
                 "build": {
-                    "resolve": "org.flyx.tex.tasks"
+                    "resolve": "org.flyx.tex.tasks",
+                    "data": "template"
                 },
                 "run": {
                     "resolve": "org.flyx.tex.tasks",
+                    "data": "template",
                     "persistent": true,
                     "buildBeforeRunning": false
                 }

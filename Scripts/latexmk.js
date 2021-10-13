@@ -59,7 +59,6 @@ function parseIssues(log_path, working_dir, preview_mode) {
 		}
 	}
 	log.close();
-	tex_suite.issues.clear();
 	for (const [path, issue_list] of Object.entries(issues)) {
 		console.log("issues exist for " + path);
 		if (nova.path.isAbsolute(path)) {
@@ -79,10 +78,11 @@ class Latexmk {
 		this.source_file = source_file;
 	}
 	
-	// if preview_mode is given, notifications will be issued and Skim will be brought
-	// to the foreground when latexmk is done.
-	run(preview_mode) {
+	// environment must be either "workspace", "preview" or a path to the RC file to inject.
+	run(environment) {
+		tex_suite.issues.clear();
 		return new Promise((resolve, reject) => {
+			const preview_mode = environment != "workspace";
 			const skim_preview = tex_suite.getSkimPreview();
 			if (preview_mode) {
 				if (skim_preview.opened) {
@@ -93,14 +93,15 @@ class Latexmk {
 			}
 			let latexmk_proc = new ProcWrapper("/bin/sh", {
 				args: [nova.path.join(nova.extension.path, "Scripts", "run_latexmk.sh"), this.working_dir,
-				       preview_mode ? "true" : "false", this.processor, this.source_file]
+				       environment, this.processor, this.source_file],
+				cwd: nova.workspace.path
 			});
 			let refer_to_path = null;
 			latexmk_proc.onStderr((line) => {
 				let str = line.trim();
 				if (str.startsWith("Refer to '")) {
 					refer_to_path = str.substr(10, str.lastIndexOf("'") - 10);
-				} else console.log(line);
+				}
 			});
 			latexmk_proc.onDidExit((status) => {
 				nova.subscriptions.remove(latexmk_proc);
