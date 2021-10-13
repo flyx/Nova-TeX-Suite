@@ -133,6 +133,12 @@ class Latexmk {
 			nova.subscriptions.add(latexmk_proc);
 		});
 	}
+	
+	static cleanProcess() {
+		return new TaskProcessAction("/usr/bin/env", {
+			args: ["latexmk", "-c"]
+		});
+	}
 }
 
 exports.Latexmk = Latexmk;

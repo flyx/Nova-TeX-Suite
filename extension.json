@@ -68,6 +68,10 @@
                     "data": "template",
                     "persistent": true,
                     "buildBeforeRunning": false
+                },
+                "clean": {
+                    "resolve": "org.flyx.tex.tasks",
+                    "data": "template"
                 }
             }
         }

@@ -42,6 +42,7 @@ nova.assistants.registerTaskAssistant({
 			let task = new Task("latexmkrc");
 			task.setAction(Task.Build, new TaskResolvableAction({data: "latexmkrc"}));
 			task.setAction(Task.Run, new TaskResolvableAction({data: "latexmkrc"}));
+			task.setAction(Task.Clean, Latexmk.cleanProcess());
 			return [task];
 		}
 		return null;
@@ -67,6 +68,8 @@ nova.assistants.registerTaskAssistant({
 				latexmk.run("preview");
 				return skim_preview.action();
 			});
+		} else if (context.action == Task.Clean) {
+			return Latexmk.cleanProcess();
 		}
 	}
 }, {identifier: "org.flyx.tex.tasks"});
