@@ -77,6 +77,7 @@ class Context {
 						}
 					}
 					tex_suite.previewNotify("context failed", "see Issues Sidebar for problems");
+					applescript.openIssues();
 					reject(nova.path.join(this.working_dir, nova.path.splitext(nova.path.basename(this.source_file))[0] + ".log"));
 				}
 			});

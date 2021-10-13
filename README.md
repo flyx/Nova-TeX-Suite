@@ -86,8 +86,8 @@ You are welcome to do PRs for any of these.
 - parse titles for ConTeXt \start\stop headings
 - add auto-completions for math commands that are only suggested in math mode
 - forward navigation in continuous preview mode (e.g. click on source, navigate to position in PDF – Skim provides an API for this, so it is doable)
-- continuous preview for ConTeXt
 - once Nova has an API available for setting the active editor, do away with the horrible AppleScript.
+  Same thing goes for opening the Issues Sidebar when an error has been encountered while building the PDF.
 
 ## License
 

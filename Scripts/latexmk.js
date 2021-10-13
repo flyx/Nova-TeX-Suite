@@ -111,6 +111,7 @@ class Latexmk {
 					console.log("latexmk failed, see log " + refer_to_path);
 					parseIssues(refer_to_path, this.working_dir, preview_mode);
 					tex_suite.previewNotify("Latexmk encountered problems", "See the Issues Sidebar for the list of errors");
+					applescript.openIssues();
 					reject(refer_to_path);
 				} else {
 					console.warn("latexmk failed, but gave no path to a log file!");

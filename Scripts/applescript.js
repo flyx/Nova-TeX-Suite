@@ -49,6 +49,14 @@ tell application "System Events" to tell process "Nova"
 end tell`);
 }
 
+exports.openIssues = function() {
+	return run(`
+tell application "System Events" to tell process "Nova"
+	click menu item "Show Issues Sidebar" of menu 1 of menu item "Sidebars" of menu "View" of menu bar 1
+end tell
+`);
+}
+
 // bring the given app to the foreground.
 exports.activateApp = function(name) {
 	return run(`tell application "${name}" to activate`);
