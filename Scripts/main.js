@@ -48,8 +48,10 @@ nova.assistants.registerTaskAssistant({
 		return null;
 	},
 	resolveTaskAction: function(context) {
-		const processor = context.data === "template" ? (context.config.get("tex.latex.processor") || "") : "";
-		const mainfile = context.data === "template" ? (context.config.get("tex.latex.mainfile") || "") : "";
+		const processor = context.config ? (context.config.get("tex.latex.processor") || "") : "";
+		const mainfile = context.config ? (context.config.get("tex.latex.mainfile") || "") : "";
+		console.log("processor=" + processor + ", mainfile=" + mainfile + ", context=");
+		console.log(context.config);
 		if (context.action == Task.Build) {
 			let latexmk = new Latexmk(nova.workspace.path, processor, mainfile);
 			return latexmk.run("workspace").then(() => {

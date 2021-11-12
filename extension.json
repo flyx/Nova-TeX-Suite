@@ -9,10 +9,46 @@
     "repository": "https://github.com/flyx/TeX.novaextension",
     "license": "MIT",
     "main": "main.js",
+    "activationEvents": [
+      "onLanguage:tex",
+      "onLanguage:latex",
+      "onLanguage:context",
+      "onWorkspaceContains:latexmkrc",
+      "onWorkspaceContains:.latexmkrc",
+      "onWorkspaceContains:*.tex"
+    ],
     "entitlements": {
         "process": true,
         "filesystem": "readwrite"
     },
+    "config": [
+        {
+            "key": "org.flyx.tex.paths.latex",
+            "title": "LaTeX search path",
+            "description": "Path that contains the LaTeX executables/scripts (latexmk, lualatex, pdflatex…). This will be added to the PATH when executing latexmk. Can be left empty if those tools are available in the PATH of your default shell.",
+            "type": "path"
+        },
+        {
+            "key": "org.flyx.tex.paths.context",
+            "title": "Path to ConTeXt",
+            "description": "The path to the `context` script. Can be left empty if context is available in the PATH of your default shell.",
+            "type": "path"
+        }
+    ],
+    "configWorkspace": [
+        {
+            "key": "org.flyx.tex.paths.latex",
+            "title": "LaTeX search path",
+            "description": "Overrides the global configuration if given.",
+            "type": "path"
+        },
+        {
+            "key": "org.flyx.tex.paths.context",
+            "title": "Path to ConTeXt",
+            "description": "Overrides the global configuration if given.",
+            "type": "path"
+        }
+    ],
     "commands": {
         "extensions": [
             {
@@ -60,8 +96,7 @@
             ],
             "tasks": {
                 "build": {
-                    "resolve": "org.flyx.tex.tasks.latexmk",
-                    "data": "template"
+                    "resolve": "org.flyx.tex.tasks.latexmk"
                 },
                 "run": {
                     "resolve": "org.flyx.tex.tasks.latexmk",
@@ -70,8 +105,7 @@
                     "buildBeforeRunning": false
                 },
                 "clean": {
-                    "resolve": "org.flyx.tex.tasks.latexmk",
-                    "data": "template"
+                    "resolve": "org.flyx.tex.tasks.latexmk"
                 }
             }
         },

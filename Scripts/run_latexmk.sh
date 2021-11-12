@@ -2,17 +2,18 @@
 # this script runs latexmk, configuring it to enable SyncTeX and opening/refreshing the
 # generated file in Skim when ready. Params:
 #  $1 = working directory
-#  $2 = environment: "workspace" if running in current workspace.
+#  $2 = tool path (where latexmk etc are located)
+#  $3 = environment: "workspace" if running in current workspace.
 #                    "preview" if running in temporary directory.
-#  $3 = processor (-pdflatex, -xelatex or -lualatex), might be empty
-#  $4 = path to file that should be processed, might be empty
+#  $4 = processor (-pdflatex, -xelatex or -lualatex), might be empty
+#  $5 = path to file that should be processed, might be empty
 
 set -e
 
-echo "pwd=$(pwd)" >&2
+export PATH=$2:$PATH
 
 ADDITIONAL_ARGS=()
-if [ "$2" = "preview" ]; then
+if [ "$3" = "preview" ]; then
 read -r -d '' PERL_SCRIPT <<'EOF' || true
 $pdf_previewer =
 	"osascript -e 'set theFile to POSIX file (\"$dir/\" & %R & \".pdf\") as alias'" .
@@ -30,12 +31,12 @@ $ENV{half_error_line} = 238;
 EOF
 ADDITIONAL_ARGS+=(-e "\$dir = '$1'; $PERL_SCRIPT" -pv -synctex=1)
 fi
-if [ "$3" ]; then
-ADDITIONAL_FLAGS+=("$3")
+if [ -n "$4" ]; then
+ADDITIONAL_ARGS+=("$4")
 fi
-if [ "$4" ]; then
-ADDITIONAL_FLAGS+=("$4")
+if [ -n "$5" ]; then
+ADDITIONAL_ARGS+=("$5")
 fi
 
-latexmk -interaction=nonstopmode -output-directory="$1" -file-line-error \
+env max_print_line=1000 error_line=254 half_error_line=238 latexmk -interaction=nonstopmode -output-directory="$1" -file-line-error \
 		-silent "${ADDITIONAL_ARGS[@]}"

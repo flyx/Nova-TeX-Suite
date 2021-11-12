@@ -10,6 +10,30 @@ const state = {
 	}
 };
 
+function findTool(name, config_name, get_dir) {
+	return new Promise((resolve, reject) => {
+		let path = nova.workspace.config[config_name];
+		if (!path) {
+			path = nova.config[config_name];
+			if (!path) {
+				let p = new Process("/bin/bash", {
+					args: [nova.path.join(nova.extension.path, "Scripts", "find_tool.sh"), name]
+				});
+				p.start();
+				p.onStdout((line) => {
+					path = get_dir ? nova.path.dirname(line.trim()) : line.trim();
+				});
+				p.onDidExit((status) => {
+					if (status == 0) resolve(path);
+					else reject("could not find tool `" + name + "` in your PATH! configure its location in your workspace or global preferences.");
+				});
+				return;
+			}
+		}
+		resolve(path);
+	});
+}
+
 module.exports = {
 	displaySkimSetup: function() {
 		nova.workspace.showInformativeMessage(`
@@ -47,10 +71,17 @@ or updating to >= v0.3.0, and can later be accessed via the Extensions menu.`);
 			this.displaySkimSetup();
 		}
 	},
-	
 	deactivate: function() {
 		console.log("Unloading TeX Suite");
 		nova.subscriptions.remove(state);
+	},
+	
+	latexPath: function() {
+		return findTool("latexmk", "org.flyx.tex.paths.latex", true);
+	},
+	
+	contextPath: function() {
+		return findTool("context", "org.flyx.tex.paths.context", false);
 	},
 	
 	previewNotify: function(title, msg) {
