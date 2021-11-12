@@ -50,6 +50,26 @@
         }
     ],
     "commands": {
+        "editor": [
+            {
+                "title": "Emphasize Selection",
+                "command": "org.flyx.tex.emph",
+                "shortcut": "cmd-shift-i",
+                "when": "editorHasFocus",
+                "filters": {
+                    "syntaxes": ["latex", "context"]
+                }
+            },
+            {
+                "title": "Make Selection Bold",
+                "command": "org.flyx.tex.bold",
+                "shortcut": "cmd-shift-b",
+                "when": "editorHasFocus",
+                "filters": {
+                    "syntaxes": ["latex", "context"]
+                }
+            }
+        ],
         "extensions": [
             {
                 "title": "Show Skim Setup Instructions",

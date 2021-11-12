@@ -7,7 +7,21 @@ const skim = require("skim.js");
 exports.activate = () => tex_suite.activate();
 exports.deactivate = () => tex_suite.deactivate();
 
+function wrapWith(latex, context) {
+	return function(editor) {
+		let start = editor.document.syntax == "latex" ? latex : context;
+		let selectedRanges = editor.selectedRanges.reverse();
+		editor.edit((e) => {
+			for (const range of selectedRanges) {
+				e.replace(range, start + editor.getTextInRange(range) + "}");
+			}
+		});
+	};
+}
+
 nova.commands.register("org.flyx.tex.skim-setup", (workspace) => tex_suite.displaySkimSetup());
+nova.commands.register("org.flyx.tex.emph", wrapWith("\\emph{", "{\\em "));
+nova.commands.register("org.flyx.tex.bold", wrapWith("\\textbf{", "{\\bf "));
 
 nova.assistants.registerIssueAssistant(["tex", "latex", "context"], {
 	provideIssues: function(editor) {
