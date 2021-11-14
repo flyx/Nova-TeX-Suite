@@ -11,11 +11,16 @@ const state = {
 };
 
 function findTool(name, config_name, get_dir) {
+	let msg = "searching path for tool " + name + "… ";
 	return new Promise((resolve, reject) => {
-		let path = nova.workspace.config[config_name];
-		if (!path) {
-			path = nova.config[config_name];
-			if (!path) {
+		let path = nova.workspace.config.get(config_name);
+		if (path) {
+			msg += "found at workspace config: ";
+		} else {
+			path = nova.config.get(config_name);
+			if (path) {
+				msg += "found at global config: ";
+			} else {
 				let p = new Process("/bin/bash", {
 					args: [nova.path.join(nova.extension.path, "Scripts", "find_tool.sh"), name]
 				});
@@ -24,12 +29,16 @@ function findTool(name, config_name, get_dir) {
 					path = get_dir ? nova.path.dirname(line.trim()) : line.trim();
 				});
 				p.onDidExit((status) => {
-					if (status == 0) resolve(path);
+					if (status == 0) {
+						console.log(msg + "found by probing shell: " + path);
+						resolve(path);
+					}
 					else reject("could not find tool `" + name + "` in your PATH! configure its location in your workspace or global preferences.");
 				});
 				return;
 			}
 		}
+		console.log(msg + path);
 		resolve(path);
 	});
 }

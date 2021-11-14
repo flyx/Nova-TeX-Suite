@@ -49,6 +49,17 @@ function findRcFile() {
   return null;
 }
 
+function handleError(msg) {
+	if (msg == null) return null; // should never happen
+	args = [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), msg];
+	if (msg.endsWith(".log")) {
+		args.push("print_log");
+	}
+	return new TaskProcessAction("/bin/sh", {
+		args: args
+	});
+}
+
 nova.assistants.registerTaskAssistant({
 	provideTasks: function() {
 		const rc_file = findRcFile();
@@ -70,12 +81,7 @@ nova.assistants.registerTaskAssistant({
 			let latexmk = new Latexmk(nova.workspace.path, processor, mainfile);
 			return latexmk.run("workspace").then(() => {
 				return new TaskProcessAction("/usr/bin/true", {args: []});
-			}).catch((log_file) => {
-				if (log_file == null) return null; // should never happen
-				return new TaskProcessAction("/bin/sh", {
-					args: [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), log_file]
-				});
-			});
+			}).catch((msg) => handleError(msg));
 		} else if (context.action == Task.Run) {
 			const my_workspace = nova.workspace;
 			return skim.setupTmpDir().then((tmp_dir) => {
@@ -97,12 +103,7 @@ nova.assistants.registerTaskAssistant({
 			let contextGenerator = new Context(nova.workspace.path, mainfile);
 			return contextGenerator.run("workspace").then(() => {
 				return new TaskProcessAction("/usr/bin/true", {args: []});
-			}).catch((log_file) => {
-				if (log_file == null) return null; // should never happen
-				return new TaskProcessAction("/bin/sh", {
-					args: [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), log_file]
-				});
-			});
+			}).catch((msg) => handleError(msg));
 		} else if (context.action == Task.Run) {
 			const my_workspace = nova.workspace;
 			return skim.setupTmpDir().then((tmp_dir) => {

@@ -49,7 +49,8 @@ class Context {
 						}
 					}
 				});
-				context_proc.onStderr((line) => console.log(line));
+				let errors = [];
+				context_proc.onStderr((line) => errors.push(line));
 				context_proc.onDidExit((status) => {
 					nova.subscriptions.remove(context_proc);
 					if (status == 0) {
@@ -66,19 +67,23 @@ class Context {
 						resolve(null);
 					} else {
 						console.warn("context failed.");
-						for (const [path, issue_list] of Object.entries(issues)) {
-							console.log("issues exist for " + path);
-							if (nova.path.isAbsolute(path)) {
-								tex_suite.issues.set(encodeURI(`file://${path}`), issue_list);
-							} else if (preview_mode) {
-								tex_suite.issues.set(encodeURI(`file://${nova.path.join(tex_suite.getSkimPreview().workspace.path, path)}`), issue_list);
-							} else {
-								tex_suite.issues.set(encodeURI(`file://${nova.path.join(this.working_dir, path)}`), issue_list);
+						if (Object.keys(issues).length > 0) {
+							for (const [path, issue_list] of Object.entries(issues)) {
+								console.log("issues exist for " + path);
+								if (nova.path.isAbsolute(path)) {
+									tex_suite.issues.set(encodeURI(`file://${path}`), issue_list);
+								} else if (preview_mode) {
+									tex_suite.issues.set(encodeURI(`file://${nova.path.join(tex_suite.getSkimPreview().workspace.path, path)}`), issue_list);
+								} else {
+									tex_suite.issues.set(encodeURI(`file://${nova.path.join(this.working_dir, path)}`), issue_list);
+								}
 							}
+							tex_suite.previewNotify("context failed", "see Issues Sidebar for problems");
+							applescript.openIssues();
+							reject(nova.path.join(this.working_dir, nova.path.splitext(nova.path.basename(this.source_file))[0] + ".log"));
+						} else {
+							reject(errors.join("\n"));
 						}
-						tex_suite.previewNotify("context failed", "see Issues Sidebar for problems");
-						applescript.openIssues();
-						reject(nova.path.join(this.working_dir, nova.path.splitext(nova.path.basename(this.source_file))[0] + ".log"));
 					}
 				});
 				context_proc.start();

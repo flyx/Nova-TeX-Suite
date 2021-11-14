@@ -88,12 +88,15 @@ class Latexmk {
 					cwd: nova.workspace.path
 				});
 				let refer_to_path = null;
+				let errors = [];
 				latexmk_proc.onStderr((line) => {
 					let str = line.trim();
 					if (str.startsWith("Refer to '")) {
 						refer_to_path = str.substr(10, str.lastIndexOf("'") - 10);
 					} else if (str.startsWith("run_latexmk.sh: ")) {
 						console.log(str.substr(16));
+					} else {
+						errors.push(str);
 					}
 				});
 				latexmk_proc.onDidExit((status) => {
@@ -119,7 +122,7 @@ class Latexmk {
 					} else {
 						console.warn("latexmk failed, but gave no path to a log file!");
 						tex_suite.previewNotify("Latexmk failed unexpectedly", "no error log available (this should not happen)");
-						reject(null);
+						reject(errors.join("\n"));
 					}
 				});
 				latexmk_proc.start();

@@ -10,7 +10,7 @@
 
 set -e
 
-export PATH=$2:$PATH
+export PATH="$2:$PATH"
 
 ADDITIONAL_ARGS=()
 if [ "$3" = "preview" ]; then
@@ -38,5 +38,5 @@ if [ -n "$5" ]; then
 ADDITIONAL_ARGS+=("$5")
 fi
 
-env max_print_line=1000 error_line=254 half_error_line=238 latexmk -interaction=nonstopmode -output-directory="$1" -file-line-error \
+env max_print_line=1000 error_line=254 half_error_line=238 "$2/latexmk" -interaction=nonstopmode -output-directory="$1" -file-line-error \
 		-silent "${ADDITIONAL_ARGS[@]}"
