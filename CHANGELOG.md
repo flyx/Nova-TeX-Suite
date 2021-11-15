@@ -1,3 +1,10 @@
+## Version 0.5.1
+
+All:
+
+- fixed the previously added preferences and shell probing to actually work (#2)
+- improved error messages on tooling problems (e.g. when the latexmk or context executables are not found)
+
 ## Version 0.5.0
 
 LaTeX:
