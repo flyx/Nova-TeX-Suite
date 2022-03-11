@@ -34,6 +34,26 @@
             "title": "Path to ConTeXt",
             "description": "The path to the `context` script. Can be left empty if context is available in the PATH of your default shell.",
             "type": "path"
+        },
+        {
+            "key": "org.flyx.tex.paths.skim",
+            "title": "Path to Skim",
+            "description": "The Skim application is used for previewing generated PDF files. Make sure that Nova is selected in Skim’s PDF–TeX Sync preferences, as explained in the Extension Help.",
+            "type": "path",
+            "default": "/Applications/Skim.app"
+        },
+        {
+            "key": "org.flyx.tex.latex.engine",
+            "title": "PDF Engine",
+            "type": "enum",
+            "radio": true,
+            "values": [
+                ["-pdflatex", "pdfLaTeX"],
+                ["-xelatex",  "XeLaTex"],
+                ["-lualatex", "LuaLaTeX"]
+            ],
+            "default": "-lualatex",
+            "description": "The default engine used to build PDF files which is used in the absence of a .latexmkrc file."
         }
     ],
     "configWorkspace": [
