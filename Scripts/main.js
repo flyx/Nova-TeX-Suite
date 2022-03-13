@@ -33,6 +33,8 @@ class LatexTaskProvider {
 	constructor() {
 		nova.config.onDidChange("org.flyx.tex.paths.skim", LatexTaskProvider.reload, this);
 		nova.config.onDidChange("org.flyx.tex.paths.latex", LatexTaskProvider.reload, this);
+		nova.fs.watch("latexmkrc", () => this.reload());
+		nova.fs.watch(".latexmkrc", () => this.reload());
 		this.reload();
 	}
 	
@@ -109,25 +111,23 @@ class LatexTaskProvider {
 			content.close();
 			if (defines_files) {
 				return new Promise((resolve, reject) => {
-					const proc = new Process(latexmk, {
+					const proc = new Process("/usr/bin/perl", {
 						args: [
-							"-cd",
-							"-r",
-							rc_file,
-							"-lualatex",
-							"-lualatex='echo org.flyx.tex.latexmk: %A %D'"
-						]
+							"-e",
+							"do '" + rc_file + "'; foreach (@default_files) { print \"$_ \"; }"
+						],
+						cwd: nova.workspace.path
 					});
 					let defined_files = {};
 					proc.onStdout((line) => {
-						const data = /^org.flyx.tex.latexmk: "((?:\\"|[^"])*)" "((?:\\"|[^"])*)$"/.match(line);
-						if (data != null) {
-							defined_files[data[1] + ".tex"] = data[2];
+						for (const name of line.trim().split(" ")) {
+							defined_files[name] = name.replace(/\.tex$/, ".pdf");
 						}
 					});
-					proc.onExit((status) => {
+					proc.onStderr((line) => console.log("perl error:", line));
+					proc.onDidExit((status) => {
 						let tasks = [];
-						for (const [key, value] of defined_files.entries()) {
+						for (const [key, value] of Object.entries(defined_files)) {
 							let task = new Task(value);
 							task.setAction(Task.Build, new TaskProcessAction(this.latexmk, {
 								args: LatexTaskProvider.latexmkOpts("-r", rc_file, key)
@@ -136,7 +136,7 @@ class LatexTaskProvider {
 								args: LatexTaskProvider.latexmkOpts("-c", "-r", rc_file, key)
 							}));
 							if (this.displayline) {
-								task.setAction(Task.Run, new TaskProcessAction(this.displayLine, {
+								task.setAction(Task.Run, new TaskProcessAction(this.displayline, {
 									args: [
 										"$LineNumber",
 										value,
@@ -144,9 +144,11 @@ class LatexTaskProvider {
 									]
 								}));
 							}
+							tasks.push(task);
 						}
 						resolve(tasks.length > 0 ? tasks : [this.genericLatexmkTask()]);
 					});
+					proc.start();
 				});
 			}
 		}
