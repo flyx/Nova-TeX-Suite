@@ -57,13 +57,9 @@ function findTool(name, config_name, get_dir) {
 class LatexTaskProvider {
 	static identifier = "org.flyx.tex.latex.tasks";
 	
-	static reload() {
-		nova.workspace.reloadTasks(this.identifier);
-	}
-	
 	constructor() {
-		nova.config.onDidChange("org.flyx.tex.paths.skim", LatexTaskProvider.reload, this);
-		nova.config.onDidChange("org.flyx.tex.paths.latex", LatexTaskProvider.reload, this);
+		nova.config.onDidChange("org.flyx.tex.paths.skim", this.reload, this);
+		nova.config.onDidChange("org.flyx.tex.paths.latex", this.reload, this);
 		nova.fs.watch("latexmkrc", () => this.reload());
 		nova.fs.watch(".latexmkrc", () => this.reload());
 		this.reload();
@@ -218,14 +214,10 @@ nova.assistants.registerTaskAssistant(new LatexTaskProvider(), {
 
 class ContextTaskProvider {
 	static identifier = "org.flyx.tex.context.tasks";
-		
-	static reload() {
-		nova.workspace.reloadTasks(this.identifier);
-	}
 	
 	constructor() {
-		nova.config.onDidChange("org.flyx.tex.paths.skim", ContextTaskProvider.reload, this);
-		nova.config.onDidChange("org.flyx.tex.paths.context", ContextTaskProvider.reload, this);
+		nova.config.onDidChange("org.flyx.tex.paths.skim", this.reload, this);
+		nova.config.onDidChange("org.flyx.tex.paths.context", this.reload, this);
 		this.reload();
 	}
 	
