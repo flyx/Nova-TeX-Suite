@@ -1,11 +1,9 @@
-const tex_suite = require("tex_suite.js");
-const applescript = require("applescript.js");
-const Latexmk = require("latexmk.js").Latexmk;
-const Context = require("context.js").Context;
-const skim = require("skim.js");
-
-exports.activate = () => tex_suite.activate();
-exports.deactivate = () => tex_suite.deactivate();
+exports.activate = () => {
+	console.log("activiting TeX Suite");
+}
+exports.deactivate = () => {
+	console.log("deactiviting TeX Suite");
+}
 
 function wrapWith(latex, context) {
 	return function(editor) {
@@ -19,9 +17,42 @@ function wrapWith(latex, context) {
 	};
 }
 
-nova.commands.register("org.flyx.tex.skim-setup", (workspace) => tex_suite.displaySkimSetup());
 nova.commands.register("org.flyx.tex.emph", wrapWith("\\emph{", "{\\em "));
 nova.commands.register("org.flyx.tex.bold", wrapWith("\\textbf{", "{\\bf "));
+nova.commands.register('org.flyx.tex.getFilenameWithoutExt', (workspace) => nova.path.splitext(workspace.activeTextEditor.document.path)[0]);
+
+function findTool(name, config_name, get_dir) {
+	let msg = "searching path for tool " + name + "… ";
+	return new Promise((resolve, reject) => {
+		let path = nova.workspace.config.get(config_name);
+		if (path) {
+			msg += "found at workspace config: ";
+		} else {
+			path = nova.config.get(config_name);
+			if (path) {
+				msg += "found at global config: ";
+			} else {
+				let p = new Process("/bin/bash", {
+					args: [nova.path.join(nova.extension.path, "Scripts", "find_tool.sh"), name]
+				});
+				p.start();
+				p.onStdout((line) => {
+					path = get_dir ? nova.path.dirname(line.trim()) : line.trim();
+				});
+				p.onDidExit((status) => {
+					if (status == 0) {
+						console.log(msg + "found by probing shell: " + path);
+						resolve(path);
+					}
+					else reject("could not find tool `" + name + "` in your PATH! configure its location in your workspace or global preferences.");
+				});
+				return;
+			}
+		}
+		console.log(msg + path);
+		resolve(path);
+	});
+}
 
 class LatexTaskProvider {
 	static identifier = "org.flyx.tex.latex.tasks";
@@ -41,8 +72,7 @@ class LatexTaskProvider {
 	reload() {
 		const dlpath = nova.path.join(nova.config.get("org.flyx.tex.paths.skim"), "/Contents/SharedSupport/displayline");
 		this.displayline = nova.fs.stat(dlpath) ? dlpath : null;
-		tex_suite.findTool("latexmk", "org.flyx.tex.paths.latex", false).then((path) => {
-			console.log("setting latexmk to " + path);
+		findTool("latexmk", "org.flyx.tex.paths.latex", false).then((path) => {
 			this.latexmk = path;
 			nova.workspace.reloadTasks(LatexTaskProvider.identifier);
 		});
@@ -154,43 +184,104 @@ class LatexTaskProvider {
 		}
 		return [this.genericLatexmkTask()];
 	}
+	
+	resolveTaskAction(context) {
+		const mainfile = context.config.get("org.flyx.tex.latex.mainfile");
+		const options = context.config.get("org.flyx.tex.latex.latexmk-options");
+		if (context.action == Task.Build) {
+			return new TaskProcessAction(this.latexmk, {
+				args: ["-synctex=1", "-cd", ...options, mainfile]
+			});
+		} else if (context.action == Task.Run) {
+			if (this.displayline) {
+				return new TaskProcessAction(this.displayline, {
+					args: [
+						"$LineNumber",
+						nova.path.splitext(mainfile)[0] + ".pdf",
+						"$File"
+					],
+				});
+			} else {
+				console.error("Cannot go to PDF: Skim not found");
+			}
+		} else if (context.action == Task.Clean) {
+			return new TaskProcessAction(this.latexmk, {
+				args: ["-c", mainfile]
+			});
+		}
+	}
 }
 
 nova.assistants.registerTaskAssistant(new LatexTaskProvider(), {
 	identifier: LatexTaskProvider.identifier
 });
 
-nova.commands.register('org.flyx.tex.getFilenameWithoutExt', (workspace) => nova.path.splitext(workspace.activeTextEditor.document.path)[0]);
-
-function handleError(msg) {
-	if (msg == null) return null; // should never happen
-	args = [nova.path.join(nova.extension.path, "Scripts", "dump_and_fail.sh"), msg];
-	if (msg.endsWith(".log")) {
-		args.push("print_log");
+class ContextTaskProvider {
+	static identifier = "org.flyx.tex.context.tasks";
+		
+	static reload() {
+		nova.workspace.reloadTasks(this.identifier);
 	}
-	return new TaskProcessAction("/bin/sh", {
-		args: args
-	});
-}
-
-nova.assistants.registerTaskAssistant({
-	provideTasks: function() { return null; },
-	resolveTaskAction: function(context) {
-		const mainfile = context.config.get("tex.context.mainfile") || "";
+	
+	constructor() {
+		nova.config.onDidChange("org.flyx.tex.paths.skim", ContextTaskProvider.reload, this);
+		nova.config.onDidChange("org.flyx.tex.paths.context", ContextTaskProvider.reload, this);
+		this.reload();
+	}
+	
+	reload() {
+		const dlpath = nova.path.join(nova.config.get("org.flyx.tex.paths.skim"), "/Contents/SharedSupport/displayline");
+		this.displayline = nova.fs.stat(dlpath) ? dlpath : null;
+		findTool("context", "org.flyx.tex.paths.context", false).then((path) => {
+			this.context = path;
+			nova.workspace.reloadTasks(ContextTaskProvider.identifier);
+		});
+	}
+	
+	genericContextTask() {
+		const task = new Task("Current ConTeXt File");
+		task.setAction(Task.Build, new TaskProcessAction(this.context, {
+			args: ["--synctex", "$File"],
+		}));
+		if (this.displayline) {
+			task.setAction(Task.Run, new TaskProcessAction(this.displayline, {
+				args: [
+					"$LineNumber",
+					"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf",
+					"$File"
+				],
+			}));
+		}
+		return task;
+	}
+	
+	provideTasks() {
+		if (!this.context) return null;
+		return [this.genericContextTask()];
+	}
+	
+	resolveTaskAction(context) {
+		const mainfile = context.config.get("org.flyx.tex.context.mainfile");
 		if (context.action == Task.Build) {
-			let contextGenerator = new Context(nova.workspace.path, mainfile);
-			return contextGenerator.run("workspace").then(() => {
-				return new TaskProcessAction("/usr/bin/true", {args: []});
-			}).catch((msg) => handleError(msg));
-		} else if (context.action == Task.Run) {
-			const my_workspace = nova.workspace;
-			return skim.setupTmpDir().then((tmp_dir) => {
-				const skim_preview = new skim.Preview(tmp_dir, new Context(tmp_dir, mainfile), my_workspace);
-				skim_preview.regenerate();
-				return skim_preview.action();
+			return new TaskProcessAction(this.context, {
+				args: ["--synctex", mainfile]
 			});
-		} else if (context.action == Task.Clean) {
-			return Context.cleanProcess();
+		} else if (context.action == Task.Run) {
+			if (this.displayline) {
+				return new TaskProcessAction(this.displayline, {
+					args: [
+						"$LineNumber",
+						nova.path.splitext(mainfile)[0] + ".pdf",
+						"$File"
+					],
+				});
+			} else {
+				console.error("Cannot go to PDF: Skim not found");
+			}
 		}
 	}
-}, {identifier: "org.flyx.tex.tasks.context"});
+}
+
+nova.assistants.registerTaskAssistant(new ContextTaskProvider(), {
+	identifier: ContextTaskProvider.identifier
+});

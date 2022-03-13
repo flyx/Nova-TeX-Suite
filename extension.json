@@ -116,37 +116,31 @@
             "description": "Builds the PDF via latexmk. Supports auto-update & preview with Skim via run button.",
             "config": [
                 {
-                    "key": "tex.latex.mainfile",
+                    "key": "org.flyx.tex.latex.mainfile",
                     "title": "Main file",
                     "description": "The file latexmk should be called upon",
                     "type": "path"
                 },
                 {
-                    "key": "tex.latex.processor",
-                    "title": "LaTeX processor",
-                    "description": "The LaTeX processor that should be used for building your PDF.",
-                    "type": "enum",
-                    "values": [
-                        ["-pdflatex", "pdfLaTeX"],
-                        ["-xelatex", "XeLaTeX"],
-                        ["-lualatex", "LuaLaTeX"],
-                        ["", "Let latexmk choose"]
-                    ],
-                    "default": "-lualatex"
+                    "key": "org.flyx.tex.latex.latexmk-options",
+                    "title": "latexmk options",
+                    "description": "options that should be passed to latexmk. Should include a PDF processor, e.g. '-lualatex', if you do not use a latexmkrc file that specifies it. The '-synctex=1' option will always be added automatically.",
+                    "type": "stringArray",
+                    "default": ["-lualatex"]
                 }
             ],
             "tasks": {
                 "build": {
-                    "resolve": "org.flyx.tex.tasks.latexmk"
+                    "resolve": "org.flyx.tex.latex.tasks"
                 },
                 "run": {
-                    "resolve": "org.flyx.tex.tasks.latexmk",
+                    "resolve": "org.flyx.tex.latex.tasks",
                     "data": "template",
                     "persistent": true,
                     "buildBeforeRunning": false
                 },
                 "clean": {
-                    "resolve": "org.flyx.tex.tasks.latexmk"
+                    "resolve": "org.flyx.tex.latex.tasks"
                 }
             }
         },
@@ -155,23 +149,21 @@
             "description": "Builds the PDF with context. Supports auto-update & preview with Skim via run button.",
             "config": [
                 {
-                    "key": "tex.context.mainfile",
+                    "key": "org.flyx.tex.context.mainfile",
                     "title": "Main file",
-                    "description": "The file context should be called upon",
+                    "description": "The file context should be called upon (defaults to the current file)",
+                    "default": "$File",
                     "type": "path"
                 }
             ],
             "tasks": {
                 "build": {
-                    "resolve": "org.flyx.tex.tasks.context"
+                    "resolve": "org.flyx.tex.context.tasks"
                 },
                 "run": {
-                    "resolve": "org.flyx.tex.tasks.context",
-                    "persistent": true,
+                    "resolve": "org.flyx.tex.context.tasks",
+                    "persistent": false,
                     "buildBeforeRunning": false
-                },
-                "clean": {
-                    "resolve": "org.flyx.tex.tasks.context"
                 }
             }
         }
