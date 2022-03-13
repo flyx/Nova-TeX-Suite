@@ -166,7 +166,7 @@ class LatexTaskProvider {
 									args: [
 										"$LineNumber",
 										value,
-										key
+										"$File"
 									]
 								}));
 							}
