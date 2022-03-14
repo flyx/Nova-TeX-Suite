@@ -24,36 +24,71 @@
     },
     "config": [
         {
-            "key": "org.flyx.tex.paths.latex",
-            "title": "LaTeX search path",
-            "description": "Path that contains the LaTeX executables/scripts (latexmk, lualatex, pdflatex…). This will be added to the PATH when executing latexmk. Can be left empty if those tools are available in the PATH of your default shell.",
-            "type": "path"
+            "title": "LaTeX Options",
+            "description": "Options for building LaTeX documents with latemxk",
+            "type": "section",
+            "children": [
+                {
+                    "key": "org.flyx.tex.paths.latex",
+                    "title": "LaTeX search path",
+                    "description": "Path that contains the LaTeX executables/scripts (latexmk, lualatex, pdflatex…). This will be added to the PATH when executing latexmk. Can be left empty if those tools are available in the PATH of your default shell.",
+                    "type": "path"
+                },
+                {
+                    "key": "org.flyx.tex.latex.engine",
+                    "title": "PDF Engine",
+                    "type": "enum",
+                    "radio": true,
+                    "values": [
+                        ["-pdflatex", "pdfLaTeX"],
+                        ["-xelatex",  "XeLaTeX"],
+                        ["-lualatex", "LuaLaTeX"]
+                    ],
+                    "default": "-lualatex",
+                    "description": "The default engine used to build PDF files which is used in the absence of a .latexmkrc file."
+                }
+            ]
         },
         {
-            "key": "org.flyx.tex.paths.context",
-            "title": "Path to ConTeXt",
-            "description": "The path to the `context` script. Can be left empty if context is available in the PATH of your default shell.",
-            "type": "path"
+            "title": "ConTeXt Options",
+            "description": "Options for building ConTeXt documents",
+            "type": "section",
+            "children": [
+                {
+                    "key": "org.flyx.tex.paths.context",
+                    "title": "Path to ConTeXt",
+                    "description": "The path to the `context` script. Can be left empty if context is available in the PATH of your default shell.",
+                    "type": "path"
+                }
+            ]
         },
         {
-            "key": "org.flyx.tex.paths.skim",
-            "title": "Path to Skim",
-            "description": "The Skim application is used for previewing generated PDF files. Make sure that Nova is selected in Skim’s PDF–TeX Sync preferences, as explained in the Extension Help.",
-            "type": "path",
-            "default": "/Applications/Skim.app"
-        },
-        {
-            "key": "org.flyx.tex.latex.engine",
-            "title": "PDF Engine",
-            "type": "enum",
-            "radio": true,
-            "values": [
-                ["-pdflatex", "pdfLaTeX"],
-                ["-xelatex",  "XeLaTex"],
-                ["-lualatex", "LuaLaTeX"]
-            ],
-            "default": "-lualatex",
-            "description": "The default engine used to build PDF files which is used in the absence of a .latexmkrc file."
+            "title": "Skim Options",
+            "description": "These options apply to using Skim as PDF previewer.",
+            "type": "section",
+            "children": [
+                {
+                    "key": "org.flyx.tex.paths.skim",
+                    "title": "Path to Skim",
+                    "description": "The Skim application is used for previewing generated PDF files. Make sure that Nova is selected in Skim’s PDF–TeX Sync preferences, as explained in the Extension Help.",
+                    "type": "path",
+                    "default": "/Applications/Skim.app"
+                },
+                {
+                    "key": "org.flyx.tex.skim.revert",
+                    "title": "Revert Skim on Run",
+                    "description": "Causes the PDF file in Skim to be reloaded when you use the Run action. Should only be used if Skim isn't set up to do this automatically.",
+                    "type": "boolean",
+                    "default": false
+                },
+                {
+                    "key": "org.flyx.tex.skim.background",
+                    "title": "Keep Skim in background on Run",
+                    "description": "Don't bring the Skim window into foreground when the Run action is used.",
+                    "type": "boolean",
+                    "default": false
+                }
+            ]
         }
     ],
     "configWorkspace": [
@@ -119,7 +154,9 @@
                     "key": "org.flyx.tex.latex.mainfile",
                     "title": "Main file",
                     "description": "The file latexmk should be called upon",
-                    "type": "path"
+                    "type": "path",
+                    "filetype": ["tex"],
+                    "required": true
                 },
                 {
                     "key": "org.flyx.tex.latex.latexmk-options",
@@ -153,7 +190,9 @@
                     "title": "Main file",
                     "description": "The file context should be called upon (defaults to the current file)",
                     "default": "$File",
-                    "type": "path"
+                    "type": "path",
+                    "filetype": ["tex"],
+                    "required": true
                 }
             ],
             "tasks": {

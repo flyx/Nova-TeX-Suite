@@ -54,6 +54,19 @@ function findTool(name, config_name, get_dir) {
 	});
 }
 
+function displayLine(path, pdf) {
+	const args = [];
+	if (nova.config.get("org.flyx.tex.skim.revert")) {
+		args.push("-revert");
+	}
+	if (nova.config.get("org.flyx.tex.skim.background")) {
+		args.push("-background");
+	}
+	args.push("$LineNumber", pdf, "$File");
+	args.push(pdf)
+	return new TaskProcessAction(path, {args: args});
+}
+
 class LatexTaskProvider {
 	static identifier = "org.flyx.tex.latex.tasks";
 	
@@ -92,13 +105,7 @@ class LatexTaskProvider {
 			args: LatexTaskProvider.latexmkOpts("$(Config:org.flyx.tex.latex.engine)", "-c", "$File"),
 		}));
 		if (this.displayline) {
-			task.setAction(Task.Run, new TaskProcessAction(this.displayline, {
-				args: [
-					"$LineNumber",
-					"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf",
-					"$File"
-				],
-			}));
+			task.setAction(Task.Run, displayLine(this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
@@ -162,13 +169,7 @@ class LatexTaskProvider {
 								args: LatexTaskProvider.latexmkOpts("-c", "-r", rc_file, key)
 							}));
 							if (this.displayline) {
-								task.setAction(Task.Run, new TaskProcessAction(this.displayline, {
-									args: [
-										"$LineNumber",
-										value,
-										"$File"
-									]
-								}));
+								task.setAction(Task.Run, displayLine(this.displayline, value));
 							}
 							tasks.push(task);
 						}
@@ -190,13 +191,7 @@ class LatexTaskProvider {
 			});
 		} else if (context.action == Task.Run) {
 			if (this.displayline) {
-				return new TaskProcessAction(this.displayline, {
-					args: [
-						"$LineNumber",
-						nova.path.splitext(mainfile)[0] + ".pdf",
-						"$File"
-					],
-				});
+				return displayLine(this.displayline, nova.path.splitext(mainfile)[0] + ".pdf");
 			} else {
 				console.error("Cannot go to PDF: Skim not found");
 			}
@@ -236,13 +231,7 @@ class ContextTaskProvider {
 			args: ["--synctex", "$File"],
 		}));
 		if (this.displayline) {
-			task.setAction(Task.Run, new TaskProcessAction(this.displayline, {
-				args: [
-					"$LineNumber",
-					"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf",
-					"$File"
-				],
-			}));
+			task.setAction(Task.Run, displayLine(this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
@@ -260,13 +249,7 @@ class ContextTaskProvider {
 			});
 		} else if (context.action == Task.Run) {
 			if (this.displayline) {
-				return new TaskProcessAction(this.displayline, {
-					args: [
-						"$LineNumber",
-						nova.path.splitext(mainfile)[0] + ".pdf",
-						"$File"
-					],
-				});
+				return displayLine(this.displayline, nova.path.splitext(mainfile)[0] + ".pdf");
 			} else {
 				console.error("Cannot go to PDF: Skim not found");
 			}
