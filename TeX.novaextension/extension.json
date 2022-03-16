@@ -7,7 +7,6 @@
     "categories": ["languages", "completions", "commands", "tasks"],
     "bugs": "https://github.com/flyx/TeX.novaextension/issues",
     "repository": "https://github.com/flyx/TeX.novaextension",
-    "funding": "https://github.com/sponsors/flyx",
     "license": "MIT",
     "main": "main.js",
     "activationEvents": [
