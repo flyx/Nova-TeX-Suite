@@ -2,9 +2,9 @@
 
 Supported languages:
 
- - LaTeX
- - ConTeXt
- - plain TeX
+- LaTeX
+- ConTeXt
+- plain TeX
 
 Supported features:
 
@@ -50,8 +50,8 @@ You can use any language server that supports talking via stdin/stdout.
 Specify the path to the language server in the extension's preferences.
 Recommended language servers are:
 
- - [TexLab](https://github.com/latex-lsp/texlab) (default for LaTeX, supports LaTeX)
- - [Digestif](https://github.com/latex-lsp/texlab) (default for ConTeXt, supports LaTeX and ConTeXt)
+- [TexLab](https://github.com/latex-lsp/texlab) (default for LaTeX, supports LaTeX)
+- [Digestif](https://github.com/latex-lsp/texlab) (default for ConTeXt, supports LaTeX and ConTeXt)
 
 ### PDF Building and Preview
 

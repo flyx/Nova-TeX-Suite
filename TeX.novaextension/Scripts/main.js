@@ -1,14 +1,22 @@
-let langserver = null;
+let langservers = {
+	latex: null,
+	context: null,
+};
 
 exports.activate = () => {
 	console.log("activiting TeX Suite");
-	langserver = new LatexLanguageServer();
+	langservers.latex = new TexLanguageServer("latex", "texlab");
+	langservers.context = new TexLanguageServer("context", "digestif");
 }
 exports.deactivate = () => {
 	console.log("deactiviting TeX Suite");
-	if (langserver) {
-			langserver.deactivate();
-			langserver = null;
+	if (langservers.latex) {
+		langservers.latex.deactivate();
+		langservers.latex = null;
+	}
+	if (langservers.context) {
+		langservers.context.deactivate();
+		langservers.context = null;
 	}
 }
 
@@ -26,10 +34,11 @@ function wrapWith(latex, context) {
 
 nova.commands.register("org.flyx.tex.emph", wrapWith("\\emph{", "{\\em "));
 nova.commands.register("org.flyx.tex.bold", wrapWith("\\textbf{", "{\\bf "));
-nova.commands.register('org.flyx.tex.getFilenameWithoutExt', (workspace) => nova.path.splitext(workspace.activeTextEditor.document.path)[0]);
+nova.commands.register('org.flyx.tex.getFilenameWithoutExt',
+	(workspace) => nova.path.splitext(workspace.activeTextEditor.document.path)[0]);
 
 function findTool(name, config_name, get_dir) {
-	let msg = "searching path for tool " + name + "… ";
+	let msg = `searching path for tool ${name} …`;
 	return new Promise((resolve, reject) => {
 		let path = nova.workspace.config.get(config_name);
 		if (path) {
@@ -48,10 +57,10 @@ function findTool(name, config_name, get_dir) {
 				});
 				p.onDidExit((status) => {
 					if (status == 0) {
-						console.log(msg + "found by probing shell: " + path);
+						console.log(`${msg} found by probing shell: ${path}`);
 						resolve(path);
 					}
-					else reject("could not find tool `" + name + "` in your PATH! configure its location in your workspace or global preferences.");
+					else reject(`could not find tool '${name}' in your PATH! configure its location in your workspace or global preferences.`);
 				});
 				return;
 			}
@@ -106,13 +115,16 @@ class LatexTaskProvider {
 	genericLatexmkTask() {
 		const task = new Task("Current LaTeX File");
 		task.setAction(Task.Build, new TaskProcessAction(this.latexmk, {
-			args: LatexTaskProvider.latexmkOpts("$(Config:org.flyx.tex.latex.engine)", "$File"),
+			args: LatexTaskProvider.latexmkOpts(
+				"$(Config:org.flyx.tex.latex.engine)", "$File"),
 		}));
 		task.setAction(Task.Clean, new TaskProcessAction(this.latexmk, {
-			args: LatexTaskProvider.latexmkOpts("$(Config:org.flyx.tex.latex.engine)", "-c", "$File"),
+			args: LatexTaskProvider.latexmkOpts(
+				"$(Config:org.flyx.tex.latex.engine)", "-c", "$File"),
 		}));
 		if (this.displayline) {
-			task.setAction(Task.Run, displayLine(this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+			task.setAction(Task.Run, displayLine(
+				this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
@@ -131,7 +143,7 @@ class LatexTaskProvider {
 			}
 			return rc_path;
 		}
-	  return null;
+		return null;
 	}
 	
 	provideTasks() {
@@ -154,7 +166,7 @@ class LatexTaskProvider {
 					const proc = new Process("/usr/bin/perl", {
 						args: [
 							"-e",
-							"do '" + rc_file + "'; foreach (@default_files) { print \"$_ \"; }"
+							`do '${rc_file}'; foreach (@default_files) { print \"$_ \"; }`
 						],
 						cwd: nova.workspace.path
 					});
@@ -214,12 +226,14 @@ nova.assistants.registerTaskAssistant(new LatexTaskProvider(), {
 	identifier: LatexTaskProvider.identifier
 });
 
-class LatexLanguageServer {
-	static identifier = "org.flyx.tex.latex.server";
-	
-	constructor() {
+class TexLanguageServer {
+	constructor(language, default_server) {
+		this.identifier = `org.flyx.tex.${language}.server`;
+		this.config_name = `org.flyx.tex.paths.${language}.server`;
+		this.default_server = default_server;
+		this.language = language;
 		// Observe the configuration setting for the server's location, and restart the server on change
-		nova.config.observe("org.flyx.tex.paths.latex.server", function(path) {
+		nova.config.observe(this.config_name, function(path) {
 			this.start(path);
 		}, this);
 	}
@@ -234,20 +248,25 @@ class LatexLanguageServer {
 				nova.subscriptions.remove(this.languageClient);
 		}
 		
-		findTool("texlab", "org.flyx.tex.paths.latex.server", false).then((path) => {
+		findTool(this.default_server, this.config_name, false).then((path) => {
 			// Create the client
 			var serverOptions = {
 				path: path,
-				args: ['-v']
+				args: ["-v"]
 			};
 			var clientOptions = {
 				// The set of document syntaxes for which the server is valid
-				syntaxes: ['latex']
+				syntaxes: [this.language]
 			};
-			var client = new LanguageClient("org.flyx.tex.latex", "LaTeX Language Server", serverOptions, clientOptions);
+			var client = new LanguageClient(
+				`org.flyx.tex.${this.language}`,
+				"LaTeX Language Server",
+				serverOptions,
+				clientOptions
+			);
 			
 			try {
-				console.log("starting LaTeX language server");
+				console.log(`starting '${this.language}' language server`);
 				// Start the client
 				client.start();
 				
