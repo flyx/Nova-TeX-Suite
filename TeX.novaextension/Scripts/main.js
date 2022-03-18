@@ -35,7 +35,18 @@ function wrapWith(latex, context) {
 nova.commands.register("org.flyx.tex.emph", wrapWith("\\emph{", "{\\em "));
 nova.commands.register("org.flyx.tex.bold", wrapWith("\\textbf{", "{\\bf "));
 nova.commands.register('org.flyx.tex.getFilenameWithoutExt',
-	(workspace) => nova.path.splitext(workspace.activeTextEditor.document.path)[0]);
+	(workspace) => {
+		let path = workspace.activeTextEditor?.document.path;
+		if (typeof path === 'string') {
+			const lastIndexOfSlash = path.lastIndexOf('/');
+			const indexOfExt = path.indexOf('.', lastIndexOfSlash);
+			if (indexOfExt > lastIndexOfSlash + 1) {
+				path = path.substring(0, indexOfExt);
+			}
+		}
+		return path;
+	}
+);
 
 function findTool(name, config_name, get_dir) {
 	let msg = `searching path for tool ${name} …`;
@@ -124,7 +135,7 @@ class LatexTaskProvider {
 		}));
 		if (this.displayline) {
 			task.setAction(Task.Run, displayLine(
-				this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+				this.displayline, "${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
@@ -315,7 +326,7 @@ class ContextTaskProvider {
 			args: ["--synctex", "$File"],
 		}));
 		if (this.displayline) {
-			task.setAction(Task.Run, displayLine(this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+			task.setAction(Task.Run, displayLine(this.displayline, "${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
