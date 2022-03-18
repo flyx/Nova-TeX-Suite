@@ -41,10 +41,11 @@
 					"values": [
 						["-pdflatex", "pdfLaTeX"],
 						["-xelatex",  "XeLaTeX"],
-						["-lualatex", "LuaLaTeX"]
+						["-lualatex", "LuaLaTeX"],
+						["", "none (use default from global/local .latexmkrc file)"]
 					],
-					"default": "-lualatex",
-					"description": "The default engine used to build PDF files which is used in the absence of a .latexmkrc file."
+					"default": "-pdflatex",
+					"description": "The default engine used to build PDF files which is used in the absence of a .latexmkrc file in the workspace folder."
 				},
 				{
 					"key": "org.flyx.tex.paths.latex.server",
