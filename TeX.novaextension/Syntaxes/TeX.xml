@@ -142,7 +142,7 @@
                         <expression>\{</expression>
                     </scope>
                     <scope name="tex.heading.part.name" optional="true" spell-check="true">
-                        <expression>[^\{\}\\%\#]+</expression>
+                        <expression>[^\{\}\\%\#$]+</expression>
                     </scope>
                 </subscopes>
             </scope>
@@ -161,7 +161,7 @@
                         <expression>\{</expression>
                     </scope>
                     <scope name="tex.heading.chapter.name" optional="true" spell-check="true">
-                        <expression>[^\{\}\\%\#]+</expression>
+                        <expression>[^\{\}\\%\#$]+</expression>
                     </scope>
                 </subscopes>
             </scope>
@@ -180,7 +180,7 @@
                         <expression>\{</expression>
                     </scope>
                     <scope name="tex.heading.section.name" optional="true" spell-check="true">
-                        <expression>[^\{\}\\%\#]+</expression>
+                        <expression>[^\{\}\\%\#$]+</expression>
                     </scope>
                 </subscopes>
             </scope>
@@ -199,7 +199,7 @@
                         <expression>\{</expression>
                     </scope>
                     <scope name="tex.heading.subsection.name" optional="true" spell-check="true">
-                        <expression>[^\{\}\\%\#]+</expression>
+                        <expression>[^\{\}\\%\#$]+</expression>
                     </scope>
                 </subscopes>
             </scope>
@@ -218,7 +218,7 @@
                         <expression>\{</expression>
                     </scope>
                     <scope name="tex.heading.subsubsection.name" optional="true" spell-check="true">
-                        <expression>[^\{\}\\%\#]+</expression>
+                        <expression>[^\{\}\\%\#$]+</expression>
                     </scope>
                 </subscopes>
             </scope>
