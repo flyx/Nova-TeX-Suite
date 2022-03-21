@@ -59,8 +59,8 @@ function findTool(name, config_name, get_dir) {
 			if (path) {
 				msg += "found at global config: ";
 			} else {
-				let p = new Process("/bin/bash", {
-					args: [nova.path.join(nova.extension.path, "Scripts", "find_tool.sh"), name]
+				let p = new Process("/usr/bin/env", {
+					args: ["which", name]
 				});
 				p.start();
 				p.onStdout((line) => {
