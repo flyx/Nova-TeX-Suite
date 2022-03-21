@@ -60,8 +60,7 @@ function findTool(name, config_name, get_dir) {
 				msg += "found at global config: ";
 			} else {
 				let p = new Process("/usr/bin/env", {
-					args: ["which", name],
-					shell: true
+					args: ["which", name]
 				});
 				p.start();
 				p.onStdout((line) => {
