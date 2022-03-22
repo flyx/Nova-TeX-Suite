@@ -1,3 +1,18 @@
+## Version 1.0.0 (upcoming)
+
+This release is the result of merging https://github.com/mava/Nova-LaTeX into the TeX Suite.
+
+All:
+
+- added language server support
+- removed `\chapter`, `\section` etc folding as it was not quite compatible with environment folding
+- added environments to the document symbols sidebar
+- changed Skim integration to use newer builtin functionality. This means Skim doesn't run as subprocess of Nova anymore.
+- implemented Skim forward navigation
+- removed issue parsing from `latexmk` / `context` output, since issues are now generated from the language server
+- fixed a problem where a command was parsed as sectioning command if part of the command looked like one (e.g. `\sectiona`)
+- fixed a problem when `$` was used in a sectioning title
+
 ## Version 0.5.1
 
 All:

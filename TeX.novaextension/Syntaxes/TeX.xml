@@ -12,10 +12,10 @@
     
     <indentation>
         <increase>
-            <expression>\\if|\\else|\{</expression>
+            <expression>\\if\b|\\else\b|\{</expression>
         </increase>
         <decrease>
-            <expression>\\fi|\\else|\}</expression>
+            <expression>\\fi\b|\\else\b|\}</expression>
         </decrease>
     </indentation>
     
@@ -95,12 +95,12 @@
         <collection name="optional">
             <scope name="tex.optional">
                 <starts-with>
-                    <expression>(\[)</expression>
-                    <capture number="1" name="tex.bracket"/>
+                    <expression>\[</expression>
+                    <capture number="0" name="tex.bracket"/>
                 </starts-with>
                 <ends-with>
-                    <expression>(\])</expression>
-                    <capture number="1" name="tex.bracket"/>
+                    <expression>\]</expression>
+                    <capture number="0" name="tex.bracket"/>
                 </ends-with>
                 <subscopes>
                      <scope name="tex.comma">
@@ -117,7 +117,7 @@
         </collection>
         <collection name="math-content">
             <scope name="tex.value.number" spell-check="false">
-                <expression>(\d+|\d*\.\d+)(pt|mm|cm|in|ex|em|bp|pc|dd|cc|nd|nc|sp)?</expression>
+                <expression>(\d+|\d*\.\d+)((pt|mm|cm|in|ex|em|bp|pc|dd|cc|nd|nc|sp)\b)?</expression>
             </scope>
             <scope name="tex.math.string" spell-check="false">
                 <expression>\p{L}+</expression>
@@ -128,11 +128,9 @@
         </collection>
         <collection name="headings">
             <scope name="tex.heading.part" spell-check="false">
-                <symbol type="heading">
-                    <context behavior="next" group="part" priority="100"/>
-                </symbol>
+                <symbol type="heading" />
                 <starts-with>
-                    <expression>\\part</expression>
+                    <expression>\\part(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
                 </starts-with>
                 <ends-with/>
@@ -147,11 +145,9 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.chapter" spell-check="false">
-                <symbol type="heading">
-                    <context behavior="next" group="chapter" priority="90"/>
-                </symbol>
+                <symbol type="heading" />
                 <starts-with>
-                    <expression>\\chapter</expression>
+                    <expression>\\chapter(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
                 </starts-with>
                 <ends-with/>
@@ -166,11 +162,9 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.section" spell-check="false">
-                <symbol type="heading">
-                    <context behavior="next" group="section" priority="80"/>
-                </symbol>
+                <symbol type="heading" />
                 <starts-with>
-                    <expression>\\section</expression>
+                    <expression>\\section(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
                 </starts-with>
                 <ends-with/>
@@ -185,11 +179,9 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.subsection" spell-check="false">
-                <symbol type="heading">
-                    <context behavior="next" group="subsection" priority="70"/>
-                </symbol>
+                <symbol type="heading" />
                 <starts-with>
-                    <expression>\\subsection</expression>
+                    <expression>\\subsection(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
                 </starts-with>
                 <ends-with/>
@@ -204,11 +196,9 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.subsubsection" spell-check="false">
-                <symbol type="heading">
-                    <context behavior="next" group="subsubsection" priority="60"/>
-                </symbol>
+                <symbol type="heading" />
                 <starts-with>
-                    <expression>\\subsubsection</expression>
+                    <expression>\\subsubsection(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
                 </starts-with>
                 <ends-with/>

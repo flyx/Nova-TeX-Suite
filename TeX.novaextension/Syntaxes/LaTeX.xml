@@ -69,7 +69,7 @@
     <collections>
         <collection name="environments">
             <scope name="tex.verbatim" spell-check="false">
-                <symbol type="block" name-selector="tex.identifier.type">
+                <symbol type="tag" name-selector="tex.identifier.type">
                     <context behavior="subtree"/>
                 </symbol>
                 <starts-with>
@@ -94,7 +94,7 @@
                 </subscopes>
             </scope>
             <scope name="tex.math.environment" spell-check="false">
-                <symbol type="block">
+                <symbol type="tag">
                     <context behavior="subtree"/>
                 </symbol>
                 <starts-with>
@@ -117,7 +117,7 @@
                 </subscopes>
             </scope>
             <scope name="tex.environment.begin" spell-check="false">
-                <symbol type="block" name-selector="tex.identifier.type">
+                <symbol type="tag" name-selector="tex.identifier.type">
                     <context behavior="start" group-by-name="true">
                         <auto-close string="\end" completion="{${name}}" />
                     </context>
@@ -129,7 +129,7 @@
                 <capture number="4" name="tex.bracket"/>
             </scope>
             <scope name="tex.environment.end" spell-check="false">
-                <symbol type="block" name-selector="tex.identifier.type">
+                <symbol type="tag" name-selector="tex.identifier.type">
                     <context behavior="end" group-by-name="true"/>
                 </symbol>
                 <expression>(\\end)(\{)(.*?)(\})</expression>
