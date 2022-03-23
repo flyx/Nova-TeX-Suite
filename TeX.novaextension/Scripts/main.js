@@ -4,7 +4,7 @@ let langservers = {
 };
 
 exports.activate = () => {
-	console.log("activiting TeX Suite");
+	console.log("activating TeX Suite");
 	langservers.latex = new TexLanguageServer("latex", "texlab");
 	langservers.context = new TexLanguageServer("context", "digestif");
 }
@@ -35,16 +35,9 @@ function wrapWith(latex, context) {
 nova.commands.register("org.flyx.tex.emph", wrapWith("\\emph{", "{\\em "));
 nova.commands.register("org.flyx.tex.bold", wrapWith("\\textbf{", "{\\bf "));
 nova.commands.register('org.flyx.tex.getFilenameWithoutExt',
-	(workspace) => {
-		let path = workspace.activeTextEditor?.document.path;
-		if (typeof path === 'string') {
-			const lastIndexOfSlash = path.lastIndexOf('/');
-			const indexOfExt = path.indexOf('.', lastIndexOfSlash);
-			if (indexOfExt > lastIndexOfSlash + 1) {
-				path = path.substring(0, indexOfExt);
-			}
-		}
-		return path;
+	(context) => {
+		let editor = TextEditor.isTextEditor(context) ? context : context.activeTextEditor;
+		return nova.path.splitext(editor.document.path)[0];
 	}
 );
 
@@ -135,7 +128,7 @@ class LatexTaskProvider {
 		}));
 		if (this.displayline) {
 			task.setAction(Task.Run, displayLine(
-				this.displayline, "${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+				this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
@@ -326,7 +319,7 @@ class ContextTaskProvider {
 			args: ["--synctex", "$File"],
 		}));
 		if (this.displayline) {
-			task.setAction(Task.Run, displayLine(this.displayline, "${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+			task.setAction(Task.Run, displayLine(this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		}
 		return task;
 	}
