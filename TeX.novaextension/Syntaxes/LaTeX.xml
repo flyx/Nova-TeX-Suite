@@ -119,7 +119,7 @@
             <scope name="tex.environment.begin" spell-check="false">
                 <symbol type="tag" name-selector="tex.identifier.type">
                     <context behavior="start" group-by-name="true">
-                        <auto-close string="\end" completion="{${name}}" />
+                        <auto-close string="\end" completion="{${name}}"/>
                     </context>
                 </symbol>
                 <expression>(\\begin)(\{)(.*?)(\})</expression>
@@ -142,7 +142,10 @@
         <collection name="headings">
             <scope name="tex.heading.paragraph" spell-check="false">
                 <symbol type="heading">
-                    <context behavior="next" group="paragraph" priority="50"/>
+                    <display-name>
+                        <component variable="name" prepend="· · · · · "/>
+                    </display-name>
+                    <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
                 <starts-with>
                     <expression>\\paragraph</expression>
@@ -161,7 +164,10 @@
             </scope>
             <scope name="tex.heading.subparagraph" spell-check="false">
                 <symbol type="heading">
-                    <context behavior="next" group="subparagraph" priority="40"/>
+                    <display-name>
+                        <component variable="name" prepend="· · · · · · "/>
+                    </display-name>
+                    <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
                 <starts-with>
                     <expression>\\subparagraph</expression>

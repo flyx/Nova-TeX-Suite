@@ -128,7 +128,9 @@
         </collection>
         <collection name="headings">
             <scope name="tex.heading.part" spell-check="false">
-                <symbol type="heading" />
+                <symbol type="heading">
+                    <context behavior="next" group="heading" foldable="false"/>
+                </symbol>
                 <starts-with>
                     <expression>\\part(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
@@ -145,7 +147,12 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.chapter" spell-check="false">
-                <symbol type="heading" />
+                <symbol type="heading">
+                    <display-name>
+                        <component variable="name" prepend="· "/>
+                    </display-name>
+                    <context behavior="next" group="heading" foldable="false"/>
+                </symbol>
                 <starts-with>
                     <expression>\\chapter(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
@@ -162,7 +169,12 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.section" spell-check="false">
-                <symbol type="heading" />
+                <symbol type="heading">
+                    <display-name>
+                        <component variable="name" prepend="· · "/>
+                    </display-name>
+                    <context behavior="next" group="heading" foldable="false"/>
+                </symbol>
                 <starts-with>
                     <expression>\\section(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
@@ -179,7 +191,12 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.subsection" spell-check="false">
-                <symbol type="heading" />
+                <symbol type="heading">
+                    <display-name>
+                        <component variable="name" prepend="· · · "/>
+                    </display-name>
+                    <context behavior="next" group="heading" foldable="false"/>
+                </symbol>
                 <starts-with>
                     <expression>\\subsection(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
@@ -196,7 +213,12 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.subsubsection" spell-check="false">
-                <symbol type="heading" />
+                <symbol type="heading">
+                    <display-name>
+                        <component variable="name" prepend="· · · · "/>
+                    </display-name>
+                    <context behavior="next" group="heading" foldable="false"/>
+                </symbol>
                 <starts-with>
                     <expression>\\subsubsection(?=\{|\[)</expression>
                     <capture number="0" name="tex.keyword"/>
