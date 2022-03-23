@@ -39,6 +39,7 @@
     <scopes spell-check="true">
         <include syntax="self" collection="math"/>
         <include syntax="self" collection="environments"/>
+        <include syntax="self" collection="commands"/>
         <include syntax="tex" collection="headings"/>
         <include syntax="tex" collection="simple"/>
         <include syntax="tex" collection="optional"/>
@@ -141,7 +142,7 @@
         </collection>
         <collection name="headings">
             <scope name="tex.heading.paragraph" spell-check="false">
-                <symbol type="heading">
+                <symbol type="tag">
                     <display-name>
                         <component variable="name" prepend="· · · · · "/>
                     </display-name>
@@ -163,7 +164,7 @@
                 </subscopes>
             </scope>
             <scope name="tex.heading.subparagraph" spell-check="false">
-                <symbol type="heading">
+                <symbol type="tag">
                     <display-name>
                         <component variable="name" prepend="· · · · · · "/>
                     </display-name>
@@ -215,6 +216,12 @@
                 </subscopes>
             </scope>
             <scope name="tex.math.inline.latex" spell-check="false">
+                <symbol type="tag-script">
+                    <context behavior="subtree"/>
+                    <display-name>
+                        <component selector="tex.math.bracket" append="…\)"/>
+                    </display-name>
+                </symbol>
                 <starts-with>
                     <expression>\\\(</expression>
                     <capture number="0" name="tex.math.bracket" />
@@ -229,6 +236,12 @@
                 </subscopes>
             </scope>
             <scope name="tex.math.display.latex" spell-check="false">
+                <symbol type="tag-script">
+                    <context behavior="subtree"/>
+                    <display-name>
+                        <component selector="tex.math.bracket" append="…\]"/>
+                    </display-name>
+                </symbol>
                 <starts-with>
                     <expression>\\\[</expression>
                     <capture number="0" name="tex.math.bracket" />
@@ -241,6 +254,26 @@
                     <include syntax="tex" collection="math-content"/>
                     <include syntax="self"/>
                 </subscopes>
+            </scope>
+        </collection>
+        <collection name="commands">
+            <scope name="org.flyx.tex.label" spell-check="false" lookup="index">
+                <symbol type="bookmark">
+                    <display-name>
+                        <component variable="name" append=" — label" />
+                    </display-name>
+                </symbol>
+                <expression>(\\label)\s*(\{)(.*)(\})</expression>
+                <capture number="1" name="tex.label.identifier.function" />
+                <capture number="2" name="tex.open.bracket" />
+                <capture number="3" name="tex.label.name.tag.attribute.value" />
+                <capture number="4" name="tex.close.bracket" />
+            </scope>
+            <scope name="latex.item" spell-check="false" lookup="index">
+                <symbol type="tag-li" />
+                <expression>\\(item)\b</expression>
+                <capture number="0" name="tex.item.identifier.function" />
+                <capture number="1" name="tex.item.name" />
             </scope>
         </collection>
     </collections>
