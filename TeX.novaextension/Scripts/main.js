@@ -4,12 +4,12 @@ let langservers = {
 };
 
 exports.activate = () => {
-	console.log("activating TeX Suite");
-	langservers.latex = new TexLanguageServer("latex", "texlab");
-	langservers.context = new TexLanguageServer("context", "digestif");
+	console.log("Activating TeX Suite");
+	langservers.latex = new TexLanguageServer("latex");
+	langservers.context = new TexLanguageServer("context");
 }
 exports.deactivate = () => {
-	console.log("deactiviting TeX Suite");
+	console.log("Deactivating TeX Suite");
 	if (langservers.latex) {
 		langservers.latex.deactivate();
 		langservers.latex = null;
@@ -41,41 +41,8 @@ nova.commands.register('org.flyx.tex.getFilenameWithoutExt',
 	}
 );
 
-function findTool(name, config_name, get_dir) {
-	let msg = `searching path for tool ${name} …`;
-	return new Promise((resolve, reject) => {
-		let path = nova.workspace.config.get(config_name);
-		if (path) {
-			msg += "found at workspace config: ";
-		} else {
-			path = nova.config.get(config_name);
-			if (path) {
-				msg += "found at global config: ";
-			} else {
-				let p = new Process("/usr/bin/env", {
-					args: ["which", name]
-				});
-				p.start();
-				p.onStdout((line) => {
-					path = get_dir ? nova.path.dirname(line.trim()) : line.trim();
-				});
-				p.onDidExit((status) => {
-					if (status == 0) {
-						console.log(`${msg} found by probing shell: ${path}`);
-						resolve(path);
-					}
-					else reject(`could not find tool '${name}' in your PATH! configure its location in your workspace or global preferences.`);
-				});
-				return;
-			}
-		}
-		console.log(msg + path);
-		resolve(path);
-	});
-}
-
-function displayLine(path, pdf) {
-	const args = [];
+function displayLine(pdf) {
+	const args = ["${Config:org.flyx.tex.paths.skim}/Contents/SharedSupport/displayline"];
 	if (nova.config.get("org.flyx.tex.skim.revert")) {
 		args.push("-revert");
 	}
@@ -84,52 +51,41 @@ function displayLine(path, pdf) {
 	}
 	args.push("$LineNumber", pdf, "$File");
 	args.push(pdf)
-	return new TaskProcessAction(path, {args: args});
+	return new TaskProcessAction("/usr/bin/env", {args: args});
 }
 
 class LatexTaskProvider {
 	static identifier = "org.flyx.tex.latex.tasks";
 	
-	constructor() {
-		nova.config.onDidChange("org.flyx.tex.paths.skim", this.reload, this);
-		nova.config.onDidChange("org.flyx.tex.paths.latex", this.reload, this);
-		nova.fs.watch("latexmkrc", () => this.reload());
-		nova.fs.watch(".latexmkrc", () => this.reload());
-		this.reload();
-	}
-	
-	reload() {
-		const dlpath = nova.path.join(nova.config.get("org.flyx.tex.paths.skim"), "/Contents/SharedSupport/displayline");
-		this.displayline = nova.fs.stat(dlpath) ? dlpath : null;
-		findTool("latexmk", "org.flyx.tex.paths.latex", false).then((path) => {
-			this.latexmk = path;
-			nova.workspace.reloadTasks(LatexTaskProvider.identifier);
+	static latexmkTask(...options) {
+		return new TaskProcessAction("/usr/bin/env", {
+			args: [
+				"${Config:org.flyx.tex.paths.latexmk}",
+				"-interaction=nonstopmode",
+				"-synctex=1",
+				"-cd",
+				...options
+			]
 		});
 	}
 	
-	static latexmkOpts(...additional) {
-		return [
-			"-interaction=nonstopmode",
-			"-synctex=1",
-			"-cd",
-			...additional
-		];
+	constructor() {
+		nova.fs.watch("latexmkrc", () => this.reload());
+		nova.fs.watch(".latexmkrc", () => this.reload());
+	}
+	
+	reload() {
+		nova.workspace.reloadTasks(LatexTaskProvider.identifier);
 	}
 	
 	genericLatexmkTask() {
 		const task = new Task("Current LaTeX File");
-		task.setAction(Task.Build, new TaskProcessAction(this.latexmk, {
-			args: LatexTaskProvider.latexmkOpts(
-				"$(Config:org.flyx.tex.latex.engine)", "$File"),
-		}));
-		task.setAction(Task.Clean, new TaskProcessAction(this.latexmk, {
-			args: LatexTaskProvider.latexmkOpts(
-				"$(Config:org.flyx.tex.latex.engine)", "-c", "$File"),
-		}));
-		if (this.displayline) {
-			task.setAction(Task.Run, displayLine(
-				this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
-		}
+		task.setAction(Task.Build, LatexTaskProvider.latexmkTask(
+			"${Config:org.flyx.tex.latex.engine}", "$File"));
+		task.setAction(Task.Clean, LatexTaskProvider.latexmkTask(
+			"${Config:org.flyx.tex.latex.engine}", "-c", "$File"));
+		task.setAction(Task.Run, displayLine(
+			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		return task;
 	}
 	
@@ -151,7 +107,6 @@ class LatexTaskProvider {
 	}
 	
 	provideTasks() {
-		if (!this.latexmk) return null;
 		const rc_file = LatexTaskProvider.findRcFile();
 		let task = null;
 		if (rc_file != null) {
@@ -185,15 +140,11 @@ class LatexTaskProvider {
 						let tasks = [];
 						for (const [key, value] of Object.entries(defined_files)) {
 							let task = new Task(value);
-							task.setAction(Task.Build, new TaskProcessAction(this.latexmk, {
-								args: LatexTaskProvider.latexmkOpts("-r", rc_file, key)
-							}));
-							task.setAction(Task.Clean, new TaskProcessAction(this.latexmk, {
-								args: LatexTaskProvider.latexmkOpts("-c", "-r", rc_file, key)
-							}));
-							if (this.displayline) {
-								task.setAction(Task.Run, displayLine(this.displayline, value));
-							}
+							task.setAction(Task.Build, LatexTaskProvider.latexmkTask(
+								"-r", rc_file, key));
+							task.setAction(Task.Clean, LatexTaskProvider.latexmkTask(
+								"-c", "-r", rc_file, key));
+							task.setAction(Task.Run, displayLine(value));
 							tasks.push(task);
 						}
 						resolve(tasks.length > 0 ? tasks : [this.genericLatexmkTask()]);
@@ -209,19 +160,11 @@ class LatexTaskProvider {
 		const mainfile = context.config.get("org.flyx.tex.latex.mainfile");
 		const options = context.config.get("org.flyx.tex.latex.latexmk-options");
 		if (context.action == Task.Build) {
-			return new TaskProcessAction(this.latexmk, {
-				args: ["-synctex=1", "-cd", ...options, mainfile]
-			});
+			return LatexTaskProvider.latexmkTask(...options, mainfile);
 		} else if (context.action == Task.Run) {
-			if (this.displayline) {
-				return displayLine(this.displayline, nova.path.splitext(mainfile)[0] + ".pdf");
-			} else {
-				console.error("Cannot go to PDF: Skim not found");
-			}
+			return displayLine(nova.path.splitext(mainfile)[0] + ".pdf");
 		} else if (context.action == Task.Clean) {
-			return new TaskProcessAction(this.latexmk, {
-				args: ["-c", mainfile]
-			});
+			return LatexTaskProvider.latexmkTask("-c", mainfile);
 		}
 	}
 }
@@ -231,10 +174,9 @@ nova.assistants.registerTaskAssistant(new LatexTaskProvider(), {
 });
 
 class TexLanguageServer {
-	constructor(language, default_server) {
+	constructor(language) {
 		this.identifier = `org.flyx.tex.${language}.server`;
 		this.config_name = `org.flyx.tex.paths.${language}.server`;
-		this.default_server = default_server;
 		this.language = language;
 		// Observe the configuration setting for the server's location, and restart the server on change
 		nova.config.observe(this.config_name, function(path) {
@@ -251,39 +193,46 @@ class TexLanguageServer {
 				this.languageClient.stop();
 				nova.subscriptions.remove(this.languageClient);
 		}
-		
-		findTool(this.default_server, this.config_name, false).then((path) => {
-			// Create the client
-			var serverOptions = {
-				path: path,
-				args: ["-v"]
-			};
-			var clientOptions = {
-				// The set of document syntaxes for which the server is valid
-				syntaxes: [this.language]
-			};
-			var client = new LanguageClient(
-				`org.flyx.tex.${this.language}`,
-				"LaTeX Language Server",
-				serverOptions,
-				clientOptions
-			);
-			
-			try {
-				console.log(`starting '${this.language}' language server`);
-				// Start the client
-				client.start();
+		const path = nova.config.get(this.config_name);
+		const proc = new Process("/usr/bin/which", {
+			args: [path]
+		});
+		let abs_path = null;
+		proc.onStdout((line) => {
+			abs_path = line.trim();
+		});
+		proc.onDidExit((status) => {
+			if (status == 0) {
+				var serverOptions = {
+					path: abs_path,
+					args: [],
+				};
+				var clientOptions = {
+					// The set of document syntaxes for which the server is valid
+					syntaxes: [this.language]
+				};
+				var client = new LanguageClient(
+					`org.flyx.tex.${this.language}`,
+					path,
+					serverOptions,
+					clientOptions
+				);
 				
-				// Add the client to the subscriptions to be cleaned up
-				nova.subscriptions.add(client);
-				this.languageClient = client;
-			} catch (err) {
-				// If the .start() method throws, it's likely because the path to the language server is invalid
-				if (nova.inDevMode()) {
-						console.error(err);
+				try {
+					client.start();
+					if (nova.inDevMode()) console.log(`[${this.language}] started language server`);
+					
+					// Add the client to the subscriptions to be cleaned up
+					nova.subscriptions.add(client);
+					this.languageClient = client;
+				} catch (err) {
+					console.error(`[${this.language}] while trying to start ${abs_path}:`, err)
 				}
+			} else {
+				console.warn(`[${this.language}] unable to find language server in PATH:`, path);
 			}
 		});
+		proc.start();
 	}
 		
 	stop() {
@@ -298,49 +247,34 @@ class TexLanguageServer {
 class ContextTaskProvider {
 	static identifier = "org.flyx.tex.context.tasks";
 	
-	constructor() {
-		nova.config.onDidChange("org.flyx.tex.paths.skim", this.reload, this);
-		nova.config.onDidChange("org.flyx.tex.paths.context", this.reload, this);
-		this.reload();
-	}
-	
-	reload() {
-		const dlpath = nova.path.join(nova.config.get("org.flyx.tex.paths.skim"), "/Contents/SharedSupport/displayline");
-		this.displayline = nova.fs.stat(dlpath) ? dlpath : null;
-		findTool("context", "org.flyx.tex.paths.context", false).then((path) => {
-			this.context = path;
-			nova.workspace.reloadTasks(ContextTaskProvider.identifier);
+	static contextTask(...options) {
+		return new TaskProcessAction("/usr/bin/env", {
+			args: [
+				"${Config:org.flyx.tex.paths.context}",
+				"--synctex",
+				...options
+			]
 		});
 	}
 	
 	genericContextTask() {
 		const task = new Task("Current ConTeXt File");
-		task.setAction(Task.Build, new TaskProcessAction(this.context, {
-			args: ["--synctex", "$File"],
-		}));
-		if (this.displayline) {
-			task.setAction(Task.Run, displayLine(this.displayline, "$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
-		}
+		task.setAction(Task.Build, ContextTaskProvider.contextTask("$File"));
+		task.setAction(Task.Run, displayLine(
+			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		return task;
 	}
 	
 	provideTasks() {
-		if (!this.context) return null;
 		return [this.genericContextTask()];
 	}
 	
 	resolveTaskAction(context) {
 		const mainfile = context.config.get("org.flyx.tex.context.mainfile");
 		if (context.action == Task.Build) {
-			return new TaskProcessAction(this.context, {
-				args: ["--synctex", mainfile]
-			});
+			return ContextTaskProvider.contextTask("--synctex", mainfile);
 		} else if (context.action == Task.Run) {
-			if (this.displayline) {
-				return displayLine(this.displayline, nova.path.splitext(mainfile)[0] + ".pdf");
-			} else {
-				console.error("Cannot go to PDF: Skim not found");
-			}
+			return displayLine(nova.path.splitext(mainfile)[0] + ".pdf");
 		}
 	}
 }

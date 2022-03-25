@@ -28,10 +28,11 @@
 			"type": "section",
 			"children": [
 				{
-					"key": "org.flyx.tex.paths.latex",
-					"title": "LaTeX search path",
-					"description": "Path that contains the LaTeX executables/scripts (latexmk, lualatex, pdflatex…). This will be added to the PATH when executing latexmk. Can be left empty if those tools are available in the PATH of your default shell.",
-					"type": "path"
+					"key": "org.flyx.tex.paths.latexmk",
+					"title": "Path to latexmk",
+					"description": "Path to the latexmk utility. May be simply 'latexmk' if it is in your PATH.",
+					"type": "path",
+					"default": "latexmk"
 				},
 				{
 					"key": "org.flyx.tex.latex.engine",
@@ -49,10 +50,10 @@
 				},
 				{
 					"key": "org.flyx.tex.paths.latex.server",
-					"title": "LaTeX Language Server Path",
+					"title": "Language Server",
 					"type": "path",
-					"default": "",
-					"description": "If unset, 'texlab' is used if available in your login shell's PATH."
+					"default": "texlab",
+					"description": "Language Server utility to use for LaTeX files."
 				}
 			]
 		},
@@ -64,15 +65,16 @@
 				{
 					"key": "org.flyx.tex.paths.context",
 					"title": "Path to ConTeXt",
-					"description": "The path to the `context` script. Can be left empty if context is available in the PATH of your default shell.",
-					"type": "path"
+					"description": "Path to the `context` utility. May be simply 'context' if it is in your PATH.",
+					"type": "path",
+					"default": "context"
 				},
 				{
 					"key": "org.flyx.tex.paths.context.server",
-					"title": "ConTeXt Language Server Path",
+					"title": "Language Server",
 					"type": "path",
-					"default": "",
-					"description": "If unset, 'digestif' is used if available in your login shell's PATH."
+					"default": "digestif",
+					"description": "Language Server utility to use for ConTeXt files."
 				}
 			]
 		},
