@@ -141,12 +141,6 @@
 					"syntaxes": ["latex", "context"]
 				}
 			}
-		],
-		"extensions": [
-			{
-				"title": "Show Skim Setup Instructions",
-				"command": "org.flyx.tex.skim-setup"
-			}
 		]
 	},
 	"issueMatchers": {
