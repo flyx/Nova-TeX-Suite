@@ -144,7 +144,7 @@
             <scope name="tex.heading.paragraph" spell-check="false">
                 <symbol type="tag">
                     <display-name>
-                        <component variable="name" prepend="· · · · · "/>
+                        <component variable="name" prepend="• • • • "/>
                     </display-name>
                     <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
@@ -166,7 +166,7 @@
             <scope name="tex.heading.subparagraph" spell-check="false">
                 <symbol type="tag">
                     <display-name>
-                        <component variable="name" prepend="· · · · · · "/>
+                        <component variable="name" prepend="• • • • • "/>
                     </display-name>
                     <context behavior="next" group="heading" foldable="false"/>
                 </symbol>

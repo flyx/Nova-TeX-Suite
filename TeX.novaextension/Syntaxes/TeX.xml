@@ -130,6 +130,9 @@
             <scope name="tex.heading.part" spell-check="false">
                 <symbol type="tag-heading">
                     <context behavior="next" group="heading" foldable="false"/>
+                    <display-name>
+                        <component variable="name" prepend="Part: "/>
+                    </display-name>
                 </symbol>
                 <starts-with>
                     <expression>\\part(?=\{|\[)</expression>
@@ -148,9 +151,6 @@
             </scope>
             <scope name="tex.heading.chapter" spell-check="false">
                 <symbol type="tag-heading">
-                    <display-name>
-                        <component variable="name" prepend="· "/>
-                    </display-name>
                     <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
                 <starts-with>
@@ -171,7 +171,7 @@
             <scope name="tex.heading.section" spell-check="false">
                 <symbol type="tag-heading">
                     <display-name>
-                        <component variable="name" prepend="· · "/>
+                        <component variable="name" prepend="• "/>
                     </display-name>
                     <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
@@ -193,7 +193,7 @@
             <scope name="tex.heading.subsection" spell-check="false">
                 <symbol type="tag-heading">
                     <display-name>
-                        <component variable="name" prepend="· · · "/>
+                        <component variable="name" prepend="• • "/>
                     </display-name>
                     <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
@@ -215,7 +215,7 @@
             <scope name="tex.heading.subsubsection" spell-check="false">
                 <symbol type="tag-heading">
                     <display-name>
-                        <component variable="name" prepend="· · · · "/>
+                        <component variable="name" prepend="• • • "/>
                     </display-name>
                     <context behavior="next" group="heading" foldable="false"/>
                 </symbol>
