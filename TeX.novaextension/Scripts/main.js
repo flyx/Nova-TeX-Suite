@@ -137,7 +137,7 @@ class LatexTaskProvider {
 					});
 					proc.onStderr((line) => console.log("perl error:", line));
 					proc.onDidExit((status) => {
-						let tasks = [];
+						let tasks = [this.genericLatexmkTask()];
 						for (const [key, value] of Object.entries(defined_files)) {
 							let task = new Task(value);
 							task.setAction(Task.Build, LatexTaskProvider.latexmkTask(
@@ -147,7 +147,7 @@ class LatexTaskProvider {
 							task.setAction(Task.Run, displayLine(value));
 							tasks.push(task);
 						}
-						resolve(tasks.length > 0 ? tasks : [this.genericLatexmkTask()]);
+						return tasks;
 					});
 					proc.start();
 				});
