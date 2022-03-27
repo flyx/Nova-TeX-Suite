@@ -162,7 +162,7 @@ class LatexTaskProvider {
 		if (context.action == Task.Build) {
 			return LatexTaskProvider.latexmkTask(...options, mainfile);
 		} else if (context.action == Task.Run) {
-			return displayLine(nova.path.splitext(mainfile)[0] + ".pdf");
+			return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
 		} else if (context.action == Task.Clean) {
 			return LatexTaskProvider.latexmkTask("-c", mainfile);
 		}
@@ -274,7 +274,7 @@ class ContextTaskProvider {
 		if (context.action == Task.Build) {
 			return ContextTaskProvider.contextTask("--synctex", mainfile);
 		} else if (context.action == Task.Run) {
-			return displayLine(nova.path.splitext(mainfile)[0] + ".pdf");
+			return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
 		}
 	}
 }
