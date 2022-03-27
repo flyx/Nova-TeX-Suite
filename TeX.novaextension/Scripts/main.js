@@ -147,7 +147,7 @@ class LatexTaskProvider {
 							task.setAction(Task.Run, displayLine(value));
 							tasks.push(task);
 						}
-						return tasks;
+						resolve(tasks);
 					});
 					proc.start();
 				});
