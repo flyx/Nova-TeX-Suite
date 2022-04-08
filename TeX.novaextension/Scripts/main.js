@@ -3,10 +3,28 @@ let langservers = {
 	context: null,
 };
 
+function resetLangServer() {
+	if (nova.workspace.config.get("org.flyx.tex." + this + ".enable")) {
+		if (langservers[this] == null) {
+			langservers[this] = new TexLanguageServer(this);
+		}
+	} else if (langservers[this] != null) {
+		langservers[this].deactivate();
+		langservers[this] = null;
+	}
+}
+
+function enableConfigCallback() {
+	resetLangServer.call(this);
+	nova.workspace.reloadTasks(TexTaskProvider.identifier);
+}
+
 exports.activate = () => {
 	console.log("Activating TeX Suite");
-	langservers.latex = new TexLanguageServer("latex");
-	langservers.context = new TexLanguageServer("context");
+	for (const lang of ["latex", "context"]) {
+		nova.workspace.config.onDidChange("org.flyx.tex." + lang + ".enable", enableConfigCallback, lang);
+		resetLangServer.call(lang);
+	}
 }
 exports.deactivate = () => {
 	console.log("Deactivating TeX Suite");
@@ -34,12 +52,23 @@ function wrapWith(latex, context) {
 
 nova.commands.register("org.flyx.tex.emph", wrapWith("\\emph{", "{\\em "));
 nova.commands.register("org.flyx.tex.bold", wrapWith("\\textbf{", "{\\bf "));
-nova.commands.register('org.flyx.tex.getFilenameWithoutExt',
+nova.commands.register("org.flyx.tex.getFilenameWithoutExt",
 	(context) => {
 		let editor = TextEditor.isTextEditor(context) ? context : context.activeTextEditor;
 		return nova.path.splitext(editor.document.path)[0];
 	}
 );
+nova.commands.register("org.flyx.tex.paths.latexmk.get", (context) => {
+	let ws = nova.workspace.config.get("org.flyx.tex.paths.latexmk");
+	if (ws == "") ws = nova.config.get("org.flyx.tex.paths.latexmk");
+	return ws;
+});
+
+nova.commands.register("org.flyx.tex.paths.context.get", (context) => {
+	let ws = nova.workspace.config.get("org.flyx.tex.paths.context");
+	if (ws == "") ws = nova.config.get("org.flyx.tex.paths.context");
+	return ws;
+});
 
 function displayLine(pdf) {
 	const args = ["${Config:org.flyx.tex.paths.skim}/Contents/SharedSupport/displayline"];
@@ -60,7 +89,7 @@ class TexTaskProvider {
 	static latexmkTask(...options) {
 		return new TaskProcessAction("/usr/bin/env", {
 			args: [
-				"${Config:org.flyx.tex.paths.latexmk}",
+				"${Command:org.flyx.tex.paths.latexmk.get}",
 				"-interaction=nonstopmode",
 				"-synctex=1",
 				"-cd",
@@ -72,7 +101,7 @@ class TexTaskProvider {
 	static contextTask(...options) {
 		return new TaskProcessAction("/usr/bin/env", {
 			args: [
-				"${Config:org.flyx.tex.paths.context}",
+				"${Command:org.flyx.tex.paths.context.get}",
 				"--synctex",
 				...options
 			]
@@ -105,12 +134,17 @@ class TexTaskProvider {
 		nova.workspace.reloadTasks(TexTaskProvider.identifier);
 	}
 	
-	genericLatexmkTask() {
+	genericLatexmkTask(has_rcfile) {
 		const task = new Task("Current LaTeX File");
-		task.setAction(Task.Build, TexTaskProvider.latexmkTask(
-			"${Config:org.flyx.tex.latex.engine}", "$File"));
-		task.setAction(Task.Clean, TexTaskProvider.latexmkTask(
-			"${Config:org.flyx.tex.latex.engine}", "-c", "$File"));
+		if (has_rcfile) {
+			task.setAction(Task.Build, TexTaskProvider.latexmkTask("$File"));
+			task.setAction(Task.Clean, TexTaskProvider.latexmkTask("-c", "$File"));
+		} else {
+			task.setAction(Task.Build, TexTaskProvider.latexmkTask(
+				"${Config:org.flyx.tex.latex.engine}", "$File"));
+			task.setAction(Task.Clean, TexTaskProvider.latexmkTask(
+				"${Config:org.flyx.tex.latex.engine}", "-c", "$File"));
+		}
 		task.setAction(Task.Run, displayLine(
 			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
 		return task;
@@ -125,8 +159,16 @@ class TexTaskProvider {
 	}
 	
 	provideTasks() {
-		const rc_file = TexTaskProvider.findRcFile();
-		let tasks = [this.genericLatexmkTask(), this.genericContextTask()];
+		let tasks = [];
+		let latex_enabled = nova.workspace.config.get("org.flyx.tex.latex.enable");
+		if (latex_enabled) {
+			tasks.push(this.genericLatexmkTask());
+		}
+		if (nova.workspace.config.get("org.flyx.tex.context.enable")) {
+			tasks.push(this.genericContextTask());
+		}
+		
+		const rc_file = latex_enabled ? TexTaskProvider.findRcFile() : null;
 		if (rc_file != null) {
 			const content = nova.fs.open(rc_file);
 			let line;

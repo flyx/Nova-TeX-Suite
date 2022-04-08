@@ -31,7 +31,7 @@
 				{
 					"key": "org.flyx.tex.paths.latexmk",
 					"title": "Path to latexmk",
-					"description": "Path to the latexmk utility. May be simply 'latexmk' if it is in your PATH.",
+					"description": "Path to the `latexmk` utility. May be simply 'latexmk' if it is in your PATH.",
 					"type": "path",
 					"default": "latexmk"
 				},
@@ -110,16 +110,32 @@
 	],
 	"configWorkspace": [
 		{
-			"key": "org.flyx.tex.paths.latex",
-			"title": "LaTeX search path",
-			"description": "Overrides the global configuration if given.",
-			"type": "path"
+			"key": "org.flyx.tex.latex.enable",
+			"title": "Enable LaTeX support",
+			"type": "boolean",
+			"description": "Whether to provide LaTeX tasks and the LaTeX language server. Disable this if you only want to have ConTeXt support.",
+			"default": true
+		},
+		{
+			"key": "org.flyx.tex.paths.latexmk",
+			"title": "Path to latexmk",
+			"description": "Path to the `latexmk` utility (overrides global setting if given).",
+			"type": "path",
+			"default": ""
+		},
+		{
+			"key": "org.flyx.tex.context.enable",
+			"title": "Enable ConTeXt support",
+			"type": "boolean",
+			"description": "Whether to provide ConTeXt tasks and the ConTeXt language server. Disable this if you only want to have LaTeX support.",
+			"default": true
 		},
 		{
 			"key": "org.flyx.tex.paths.context",
 			"title": "Path to ConTeXt",
-			"description": "Overrides the global configuration if given.",
-			"type": "path"
+			"description": "Path to the `context` utility (overrides global setting if given).",
+			"type": "path",
+			"default": ""
 		}
 	],
 	"commands": {
