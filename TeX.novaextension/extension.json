@@ -178,16 +178,18 @@
 			],
 			"tasks": {
 				"build": {
-					"resolve": "org.flyx.tex.latex.tasks"
+					"resolve": "org.flyx.tex.latex.tasks",
+					"data": "latex",
 				},
 				"run": {
 					"resolve": "org.flyx.tex.latex.tasks",
-					"data": "template",
+					"data": "latex",
 					"persistent": true,
 					"buildBeforeRunning": false
 				},
 				"clean": {
-					"resolve": "org.flyx.tex.latex.tasks"
+					"resolve": "org.flyx.tex.latex.tasks",
+					"data": "latex"
 				}
 			}
 		},
@@ -207,10 +209,12 @@
 			],
 			"tasks": {
 				"build": {
-					"resolve": "org.flyx.tex.context.tasks"
+					"resolve": "org.flyx.tex.context.tasks",
+					"data": "context"
 				},
 				"run": {
 					"resolve": "org.flyx.tex.context.tasks",
+					"data": "context",
 					"persistent": false,
 					"buildBeforeRunning": false
 				}

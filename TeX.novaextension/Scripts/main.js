@@ -54,8 +54,8 @@ function displayLine(pdf) {
 	return new TaskProcessAction("/usr/bin/env", {args: args});
 }
 
-class LatexTaskProvider {
-	static identifier = "org.flyx.tex.latex.tasks";
+class TexTaskProvider {
+	static identifier = "org.flyx.tex.tasks";
 	
 	static latexmkTask(...options) {
 		return new TaskProcessAction("/usr/bin/env", {
@@ -69,24 +69,14 @@ class LatexTaskProvider {
 		});
 	}
 	
-	constructor() {
-		nova.fs.watch("latexmkrc", () => this.reload());
-		nova.fs.watch(".latexmkrc", () => this.reload());
-	}
-	
-	reload() {
-		nova.workspace.reloadTasks(LatexTaskProvider.identifier);
-	}
-	
-	genericLatexmkTask() {
-		const task = new Task("Current LaTeX File");
-		task.setAction(Task.Build, LatexTaskProvider.latexmkTask(
-			"${Config:org.flyx.tex.latex.engine}", "$File"));
-		task.setAction(Task.Clean, LatexTaskProvider.latexmkTask(
-			"${Config:org.flyx.tex.latex.engine}", "-c", "$File"));
-		task.setAction(Task.Run, displayLine(
-			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
-		return task;
+	static contextTask(...options) {
+		return new TaskProcessAction("/usr/bin/env", {
+			args: [
+				"${Config:org.flyx.tex.paths.context}",
+				"--synctex",
+				...options
+			]
+		});
 	}
 	
 	static findRcFile() {
@@ -106,9 +96,37 @@ class LatexTaskProvider {
 		return null;
 	}
 	
+	constructor() {
+		nova.fs.watch("latexmkrc", () => this.reload());
+		nova.fs.watch(".latexmkrc", () => this.reload());
+	}
+	
+	reload() {
+		nova.workspace.reloadTasks(TexTaskProvider.identifier);
+	}
+	
+	genericLatexmkTask() {
+		const task = new Task("Current LaTeX File");
+		task.setAction(Task.Build, TexTaskProvider.latexmkTask(
+			"${Config:org.flyx.tex.latex.engine}", "$File"));
+		task.setAction(Task.Clean, TexTaskProvider.latexmkTask(
+			"${Config:org.flyx.tex.latex.engine}", "-c", "$File"));
+		task.setAction(Task.Run, displayLine(
+			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+		return task;
+	}
+	
+	genericContextTask() {
+		const task = new Task("Current ConTeXt File");
+		task.setAction(Task.Build, TexTaskProvider.contextTask("$File"));
+		task.setAction(Task.Run, displayLine(
+			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
+		return task;
+	}
+	
 	provideTasks() {
-		const rc_file = LatexTaskProvider.findRcFile();
-		let task = null;
+		const rc_file = TexTaskProvider.findRcFile();
+		let tasks = [this.genericLatexmkTask(), this.genericContextTask()];
 		if (rc_file != null) {
 			const content = nova.fs.open(rc_file);
 			let line;
@@ -137,12 +155,11 @@ class LatexTaskProvider {
 					});
 					proc.onStderr((line) => console.log("perl error:", line));
 					proc.onDidExit((status) => {
-						let tasks = [this.genericLatexmkTask()];
 						for (const [key, value] of Object.entries(defined_files)) {
 							let task = new Task(value);
-							task.setAction(Task.Build, LatexTaskProvider.latexmkTask(
+							task.setAction(Task.Build, TexTaskProvider.latexmkTask(
 								"-r", rc_file, key));
-							task.setAction(Task.Clean, LatexTaskProvider.latexmkTask(
+							task.setAction(Task.Clean, TexTaskProvider.latexmkTask(
 								"-c", "-r", rc_file, key));
 							task.setAction(Task.Run, displayLine(value));
 							tasks.push(task);
@@ -153,24 +170,34 @@ class LatexTaskProvider {
 				});
 			}
 		}
-		return [this.genericLatexmkTask()];
+		return tasks;
 	}
 	
 	resolveTaskAction(context) {
-		const mainfile = context.config.get("org.flyx.tex.latex.mainfile");
-		const options = context.config.get("org.flyx.tex.latex.latexmk-options");
-		if (context.action == Task.Build) {
-			return LatexTaskProvider.latexmkTask(...options, mainfile);
-		} else if (context.action == Task.Run) {
-			return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
-		} else if (context.action == Task.Clean) {
-			return LatexTaskProvider.latexmkTask("-c", mainfile);
+		if (context.data == "latex") {
+			const mainfile = context.config.get("org.flyx.tex.latex.mainfile");
+			const options = context.config.get("org.flyx.tex.latex.latexmk-options");
+			if (context.action == Task.Build) {
+				return TexTaskProvider.latexmkTask(...options, mainfile);
+			} else if (context.action == Task.Run) {
+				return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
+			} else if (context.action == Task.Clean) {
+				return TexTaskProvider.latexmkTask("-c", mainfile);
+			}
+		} else {
+			const mainfile = context.config.get("org.flyx.tex.context.mainfile");
+			if (context.action == Task.Build) {
+				return TexTaskProvider.contextTask("--synctex", mainfile);
+			} else if (context.action == Task.Run) {
+				return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
+			}
 		}
 	}
 }
 
-nova.assistants.registerTaskAssistant(new LatexTaskProvider(), {
-	identifier: LatexTaskProvider.identifier
+nova.assistants.registerTaskAssistant(new TexTaskProvider(), {
+	identifier: TexTaskProvider.identifier,
+	name: "Tex Suite",
 });
 
 class TexLanguageServer {
@@ -243,42 +270,3 @@ class TexLanguageServer {
 		}
 	}
 }
-
-class ContextTaskProvider {
-	static identifier = "org.flyx.tex.context.tasks";
-	
-	static contextTask(...options) {
-		return new TaskProcessAction("/usr/bin/env", {
-			args: [
-				"${Config:org.flyx.tex.paths.context}",
-				"--synctex",
-				...options
-			]
-		});
-	}
-	
-	genericContextTask() {
-		const task = new Task("Current ConTeXt File");
-		task.setAction(Task.Build, ContextTaskProvider.contextTask("$File"));
-		task.setAction(Task.Run, displayLine(
-			"$FileDirname/${Command:org.flyx.tex.getFilenameWithoutExt}.pdf"));
-		return task;
-	}
-	
-	provideTasks() {
-		return [this.genericContextTask()];
-	}
-	
-	resolveTaskAction(context) {
-		const mainfile = context.config.get("org.flyx.tex.context.mainfile");
-		if (context.action == Task.Build) {
-			return ContextTaskProvider.contextTask("--synctex", mainfile);
-		} else if (context.action == Task.Run) {
-			return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
-		}
-	}
-}
-
-nova.assistants.registerTaskAssistant(new ContextTaskProvider(), {
-	identifier: ContextTaskProvider.identifier
-});
