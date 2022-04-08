@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<syntax name="bibtex">
+    <meta>
+        <name>BibTeX</name>
+        <type>structured</type>
+        <preferred-file-extension>bib</preferred-file-extension>
+    </meta>
+    
+    <detectors>
+        <extension priority="1.0">bib</extension>
+    </detectors>
+    
+    <brackets>
+        <pair open="{" close="}" />
+        <pair open="(" close=")" />
+    </brackets>
+    
+    <surrounding-pairs>
+        <pair open="{" close="}" />
+        <pair open="(" close=")" />
+    </surrounding-pairs>
+    
+    <scopes>
+        <include syntax="self" collection="entries" />
+    </scopes>
+    
+    <collections>
+        <collection name="entries">
+            <scope name="bibtex.entry">
+                <symbol type="bookmark">
+                    <context behavior="subtree" fold-type="function" />
+                    <display-name>
+                        <component selector="bibtex.entry.keyword.construct" />
+                        <component selector="bibtex.entry.identifier.key" prepend=" — " />
+                    </display-name>
+                </symbol>
+                <starts-with>
+                    <expression>\s*(@)(\S+)(?=\s*[\{\(])</expression>
+                    <capture number="1" name="bibtex.entry.keyword.operator" />
+                    <capture number="2" name="bibtex.entry.keyword.construct" />
+                </starts-with>
+                <ends-with />
+                <subscopes anchored="true">
+                    <include syntax="self" collection="entry.blocks" />
+                </subscopes>
+            </scope>
+            <scope name="bibtex.comment" spell-check="true" lookup="dictionary">
+                <expression>.+</expression>
+            </scope>
+        </collection>
+        
+        <collection name="entry.blocks">
+            <scope name="bibtex.entry.inbraces">
+                <starts-with>
+                    <expression>\{</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>\}</expression>
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" collection="fields" />
+                </subscopes>
+            </scope>
+            <scope name="bibtex.entry.inparens">
+                <starts-with>
+                    <expression>\(</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>\)</expression>
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" collection="fields" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="fields">
+            <include syntax="self" collection="cutoff" />
+            <scope name="bibtex.entry.identifier.key">
+                <expression>\b[^\s=]+\b(?!\s*=)(?=\s*\,)</expression>
+            </scope>
+            <scope name="bibtex.field">
+                <symbol type="block">
+                <!-- Ideally this should be `<symbol type="property">`,
+                but with any symbol type that appears in the symbols sidebar
+                Nova becomes very sluggish with large files.
+                **This is a Nova problem with languages with lots of symbols
+                (for example, HTML), and not a problem with this syntax.**
+                Since `.bib` files tend to be large and have almost one field
+                scope per line, better leave this symbol off the sidebar. -->
+                    <context behavior="subtree" />
+                </symbol>
+                <starts-with>
+                    <expression>\b[^\s=]+\b(?=\s*=)</expression>
+                    <capture number="0" name="bibtex.field.tag.attribute.name" />
+                </starts-with>
+                <ends-with />
+                <subscopes anchored="true">
+                    <scope name="bibtex.assignment.operator">
+                        <expression>=</expression>
+                    </scope>
+                    <include syntax="self" collection="values" repeat="true" />
+                </subscopes>
+            </scope>
+            <scope name="bibtex.comma.operator">
+                <expression>,</expression>
+            </scope>
+            <include syntax="self" collection="values" />
+        </collection>
+        
+        <collection name="values">
+            <scope name="bibtex.value.inbraces" spell-check="true" lookup="dictionary">
+                <starts-with>
+                    <expression>\{</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>\}</expression>
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" collection="content" />
+                </subscopes>
+            </scope>
+            <scope name="bibtex.value.inquotes" spell-check="true" lookup="dictionary">
+                <starts-with>
+                    <expression>"</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>"</expression>
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" collection="content" />
+                </subscopes>
+            </scope>
+            <scope name="bibtex.tag.attribute.value">
+                <expression>\b\S+\b</expression>
+            </scope>
+            <scope name="bibtex.join.operator">
+                <expression>\#</expression>
+            </scope>
+        </collection>
+        
+        <collection name="content">
+            <include syntax="self" collection="cutoff" />
+            <scope name="latex.command.keyword" spell-check="false">
+                <expression>[&amp;~_\^\$]</expression>
+            </scope>
+            <scope name="latex.command.keyword" spell-check="false">
+                <expression>\\[a-zA-Z@]+(\*)?</expression>
+            </scope>
+            <scope name="latex.command.keyword" spell-check="false">
+                <expression>\\[$%#&amp;~_{} ,:;!@\\=&gt;&lt;+\-'`"\^\(\)]</expression>
+            </scope>
+            <scope name="bibtex.content.inbraces">
+                <starts-with>
+                    <expression>\{</expression>
+                </starts-with>
+                <ends-with>
+                    <expression>\}</expression>
+                </ends-with>
+                <subscopes>
+                    <include syntax="self" collection="content" />
+                </subscopes>
+            </scope>
+        </collection>
+        
+        <collection name="cutoff">
+            <cut-off>
+                <expression>\s*@</expression>
+            </cut-off>
+        </collection>
+    </collections>
+</syntax>

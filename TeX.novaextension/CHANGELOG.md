@@ -13,6 +13,10 @@ All:
 - fixed a problem where a command was parsed as sectioning command if part of the command looked like one (e.g. `\sectiona`)
 - fixed a problem when `$` was used in a sectioning title
 
+BibTeX:
+
+- added BibTeX syntax
+
 ## Version 0.5.1
 
 All:
