@@ -3,14 +3,15 @@ let langservers = {
 	context: null,
 };
 
-function resetLangServer() {
-	if (nova.workspace.config.get("org.flyx.tex." + this + ".enable")) {
-		if (langservers[this] == null) {
-			langservers[this] = new TexLanguageServer(this);
+function resetLangServer(enabled) {
+	if (enabled) {
+		if (!langservers[this].enabled) {
+			langservers[this].enabled = true;
+			langservers[this].start();
 		}
-	} else if (langservers[this] != null) {
-		langservers[this].deactivate();
-		langservers[this] = null;
+	} else if (langservers[this].enabled) {
+		langservers[this].enabled = false;
+		langservers[this].stop();
 	}
 }
 
@@ -22,19 +23,18 @@ function enableConfigCallback() {
 exports.activate = () => {
 	console.log("Activating TeX Suite");
 	for (const lang of ["latex", "context"]) {
-		nova.workspace.config.onDidChange("org.flyx.tex." + lang + ".enable", enableConfigCallback, lang);
-		resetLangServer.call(lang);
+		langservers[lang] = new TexLanguageServer(lang);
+		nova.workspace.config.onDidChange(`org.flyx.tex.${lang}.enable`, enableConfigCallback, lang);
+		resetLangServer.call(lang, nova.config.get(`org.flyx.tex.${lang}.enable`));
 	}
 }
 exports.deactivate = () => {
 	console.log("Deactivating TeX Suite");
-	if (langservers.latex) {
-		langservers.latex.deactivate();
-		langservers.latex = null;
-	}
-	if (langservers.context) {
-		langservers.context.deactivate();
-		langservers.context = null;
+	for (const lang of ["latex", "context"]) {
+		if (langservers[lang]) {
+			langservers[lang].deactivate();
+			langservers[lang] = null;
+		}
 	}
 }
 
@@ -247,9 +247,10 @@ class TexLanguageServer {
 		this.identifier = `org.flyx.tex.${language}.server`;
 		this.config_name = `org.flyx.tex.paths.${language}.server`;
 		this.language = language;
+		this.enabled = false;
 		// Observe the configuration setting for the server's location, and restart the server on change
-		nova.config.observe(this.config_name, function(path) {
-			this.start(path);
+		nova.config.onDidChange(this.config_name, function(path) {
+			if (this.enabled) this.start();
 		}, this);
 	}
 		
@@ -309,6 +310,7 @@ class TexLanguageServer {
 			this.languageClient.stop();
 			nova.subscriptions.remove(this.languageClient);
 			this.languageClient = null;
+			if (nova.inDevMode()) console.log(`[${this.language}] stopped language server`);
 		}
 	}
 }
