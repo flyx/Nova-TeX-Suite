@@ -32,6 +32,14 @@ You are welcome to do PRs for any of these.
  - parse titles for ConTeXt \start\stop headings
  - add auto-completions for math commands that are only suggested in math mode
 
+## Building the icon
+
+`icon.svg` is the source for the extension's icon.
+Use the following commands to regenerate the `.png` files (needs a `librsvg` installation):
+
+    rsvg-convert icon.svg -o TeX.novaextension/extension@2x.png
+    rsvg-convert -h 128 icon.svg -o TeX.novaextension/extension.png
+
 ## License
- 
+
 MIT

@@ -5,8 +5,9 @@
 	"description": "Support for TeX, LaTeX, ConTeXt and BibTeX",
 	"version": "0.5.1",
 	"categories": ["languages", "completions", "commands", "tasks"],
-	"bugs": "https://github.com/flyx/TeX.novaextension/issues",
-	"repository": "https://github.com/flyx/TeX.novaextension",
+	"bugs": "https://github.com/flyx/Nova-TeX-Suite/issues",
+	"repository": "https://github.com/flyx/Nova-TeX-Suite",
+	"funding": "https://github.com/sponsors/flyx",
 	"license": "MIT",
 	"main": "main.js",
 	"activationEvents": [

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 256 256"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <style type="text/css">
+    .corpus {
+      fill: white;
+      stroke: blue;
+      stroke-width: 12;
+    }
+  </style>
+  <defs>
+    <filter id="shadow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 .3 .3" />
+        <feFuncR type="table" tableValues="0 0"/>
+        <feFuncG type="table" tableValues="0 0"/>
+        <feFuncB type="table" tableValues="0 0"/>
+      </feComponentTransfer>
+      
+    </filter>
+    <g id="main">
+      <rect x="48" y="88" width="160" height="80" rx="24" class="corpus"/>
+      <circle cx="80" cy="40" r="20" class="corpus" style="fill:cyan"/>
+      <line x1="80" y1="60" x2="80" y2="88" class="corpus"/>
+      <circle cx="176" cy="40" r="20" class="corpus" style="fill:rgb(0, 255, 0)"/>
+      <line x1="176" y1="60" x2="176" y2="88" class="corpus"/>
+      <circle cx="80" cy="216" r="20" class="corpus" style="fill:red"/>
+      <line x1="80" y1="196" x2="80" y2="168" class="corpus"/>
+      <circle cx="176" cy="216" r="20" class="corpus" style="fill:yellow"/>
+      <line x1="176" y1="196" x2="176" y2="168" class="corpus"/>
+      <text x="96" y="144" font-size="56" text-anchor="middle" fill="black" font-weight="bold">T</text>
+      <text x="124" y="156" font-size="56" text-anchor="middle" fill="black" font-weight="bold">E</text>
+      <text x="160" y="144" font-size="56" text-anchor="middle" fill="black" font-weight="bold">X</text>
+    </g>
+  </defs>
+  
+  <g transform="translate(4, 4)" filter="url(#shadow)">
+    <use xlink:href="#main"/>
+  </g>
+  
+  <use xlink:href="#main"/>
+</svg>

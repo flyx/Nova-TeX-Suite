@@ -1,4 +1,4 @@
-## Version 1.0.0 (upcoming)
+## Version 1.0.0
 
 This release is the result of merging https://github.com/mava/Nova-LaTeX into the TeX Suite.
 
@@ -12,6 +12,7 @@ All:
 - removed issue parsing from `latexmk` / `context` output, since issues are now generated from the language server
 - fixed a problem where a command was parsed as sectioning command if part of the command looked like one (e.g. `\sectiona`)
 - fixed a problem when `$` was used in a sectioning title
+- new icon
 
 BibTeX:
 
