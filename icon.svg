@@ -21,18 +21,13 @@
       
     </filter>
     <g id="main">
-      <rect x="48" y="88" width="160" height="80" rx="24" class="corpus"/>
-      <circle cx="80" cy="40" r="20" class="corpus" style="fill:cyan"/>
-      <line x1="80" y1="60" x2="80" y2="88" class="corpus"/>
-      <circle cx="176" cy="40" r="20" class="corpus" style="fill:rgb(0, 255, 0)"/>
-      <line x1="176" y1="60" x2="176" y2="88" class="corpus"/>
-      <circle cx="80" cy="216" r="20" class="corpus" style="fill:red"/>
-      <line x1="80" y1="196" x2="80" y2="168" class="corpus"/>
-      <circle cx="176" cy="216" r="20" class="corpus" style="fill:yellow"/>
-      <line x1="176" y1="196" x2="176" y2="168" class="corpus"/>
-      <text x="96" y="144" font-size="56" text-anchor="middle" fill="black" font-weight="bold">T</text>
-      <text x="124" y="156" font-size="56" text-anchor="middle" fill="black" font-weight="bold">E</text>
-      <text x="160" y="144" font-size="56" text-anchor="middle" fill="black" font-weight="bold">X</text>
+      <rect x="36" y="180" width="50" height="50" rx="12" fill="darkblue"/>
+      <rect x="103" y="180" width="50" height="50" rx="12" fill="darkblue"/>
+      <rect x="170" y="180" width="50" height="50" rx="12" fill="darkblue"/>
+      <rect x="17" y="17" width="222" height="170" rx="24" class="corpus"/>
+      <text x="62" y="124" font-size="110" text-anchor="middle" fill="black" font-weight="bold">T</text>
+      <text x="126" y="150" font-size="110" text-anchor="middle" fill="black" font-weight="bold">E</text>
+      <text x="190" y="124" font-size="110" text-anchor="middle" fill="black" font-weight="bold">X</text>
     </g>
   </defs>
   

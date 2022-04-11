@@ -3,7 +3,7 @@
 	"name": "TeX Suite",
 	"organization": "Felix Krause",
 	"description": "Support for TeX, LaTeX, ConTeXt and BibTeX",
-	"version": "0.5.1",
+	"version": "1.0.0",
 	"categories": ["languages", "completions", "commands", "tasks"],
 	"bugs": "https://github.com/flyx/Nova-TeX-Suite/issues",
 	"repository": "https://github.com/flyx/Nova-TeX-Suite",
@@ -17,7 +17,7 @@
 		"onWorkspaceContains:latexmkrc",
 		"onWorkspaceContains:.latexmkrc",
 		"onWorkspaceContains:*.tex",
-		"onWorkspaceContains:*.bib",
+		"onWorkspaceContains:*.bib"
 	],
 	"entitlements": {
 		"process": true,
@@ -197,7 +197,7 @@
 			"tasks": {
 				"build": {
 					"resolve": "org.flyx.tex.latex.tasks",
-					"data": "latex",
+					"data": "latex"
 				},
 				"run": {
 					"resolve": "org.flyx.tex.latex.tasks",
