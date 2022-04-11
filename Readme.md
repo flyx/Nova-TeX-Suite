@@ -1,6 +1,6 @@
-# TeX Suite for Nova.app: Support for TeX, LaTeX and ConTeXt
+# TeX Suite for Nova.app
 
-This [Nova](https://nova.app) extension provides syntax highlighting and autocompletion for **TeX** languages including **LaTeX** and **ConTeXt**.
+This [Nova](https://nova.app) extension provides syntax highlighting and autocompletion for **TeX** languages including **LaTeX**, **ConTeXt** and **BibTeX**.
 See [the extension's Readme](TeX.novaextension/README.md) for user documentation.
 
 ## Remarks
