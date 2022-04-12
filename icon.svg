@@ -5,7 +5,7 @@
   <style type="text/css">
     .corpus {
       fill: white;
-      stroke: blue;
+      stroke: black;
       stroke-width: 12;
     }
   </style>
@@ -21,10 +21,10 @@
       
     </filter>
     <g id="main">
-      <rect x="36" y="180" width="50" height="50" rx="12" fill="darkblue"/>
-      <rect x="103" y="180" width="50" height="50" rx="12" fill="darkblue"/>
-      <rect x="170" y="180" width="50" height="50" rx="12" fill="darkblue"/>
-      <rect x="17" y="17" width="222" height="170" rx="24" class="corpus"/>
+      <rect x="17" y="17" width="222" height="222" rx="24" class="corpus"/>
+      <rect x="36" y="170" width="50" height="50" rx="12" fill="black"/>
+      <rect x="103" y="170" width="50" height="50" rx="12" fill="black"/>
+      <rect x="170" y="170" width="50" height="50" rx="12" fill="black"/>
       <text x="62" y="124" font-size="110" text-anchor="middle" fill="black" font-weight="bold">T</text>
       <text x="126" y="150" font-size="110" text-anchor="middle" fill="black" font-weight="bold">E</text>
       <text x="190" y="124" font-size="110" text-anchor="middle" fill="black" font-weight="bold">X</text>

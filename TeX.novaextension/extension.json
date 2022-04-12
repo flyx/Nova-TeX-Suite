@@ -3,7 +3,7 @@
 	"name": "TeX Suite",
 	"organization": "Felix Krause",
 	"description": "Support for TeX, LaTeX, ConTeXt and BibTeX",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"categories": ["languages", "completions", "commands", "tasks"],
 	"bugs": "https://github.com/flyx/Nova-TeX-Suite/issues",
 	"repository": "https://github.com/flyx/Nova-TeX-Suite",
@@ -196,17 +196,16 @@
 			],
 			"tasks": {
 				"build": {
-					"resolve": "org.flyx.tex.latex.tasks",
+					"resolve": "org.flyx.tex.tasks",
 					"data": "latex"
 				},
 				"run": {
-					"resolve": "org.flyx.tex.latex.tasks",
+					"resolve": "org.flyx.tex.tasks",
 					"data": "latex",
-					"persistent": true,
 					"buildBeforeRunning": false
 				},
 				"clean": {
-					"resolve": "org.flyx.tex.latex.tasks",
+					"resolve": "org.flyx.tex.tasks",
 					"data": "latex"
 				}
 			}
@@ -227,13 +226,12 @@
 			],
 			"tasks": {
 				"build": {
-					"resolve": "org.flyx.tex.context.tasks",
+					"resolve": "org.flyx.tex.tasks",
 					"data": "context"
 				},
 				"run": {
-					"resolve": "org.flyx.tex.context.tasks",
+					"resolve": "org.flyx.tex.tasks",
 					"data": "context",
-					"persistent": false,
 					"buildBeforeRunning": false
 				}
 			}

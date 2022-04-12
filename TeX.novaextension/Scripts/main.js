@@ -58,17 +58,21 @@ nova.commands.register("org.flyx.tex.getFilenameWithoutExt",
 		return nova.path.splitext(editor.document.path)[0];
 	}
 );
-nova.commands.register("org.flyx.tex.paths.latexmk.get", (context) => {
+
+function getLatexmk() {
 	let ws = nova.workspace.config.get("org.flyx.tex.paths.latexmk");
 	if (ws == "") ws = nova.config.get("org.flyx.tex.paths.latexmk");
 	return ws;
-});
+}
 
-nova.commands.register("org.flyx.tex.paths.context.get", (context) => {
+function getContext() {
 	let ws = nova.workspace.config.get("org.flyx.tex.paths.context");
 	if (ws == "") ws = nova.config.get("org.flyx.tex.paths.context");
 	return ws;
-});
+}
+
+nova.commands.register("org.flyx.tex.paths.latexmk.get", getLatexmk);
+nova.commands.register("org.flyx.tex.paths.context.get", getContext);
 
 function displayLine(pdf) {
 	const args = ["${Config:org.flyx.tex.paths.skim}/Contents/SharedSupport/displayline"];
@@ -89,7 +93,7 @@ class TexTaskProvider {
 	static latexmkTask(...options) {
 		return new TaskProcessAction("/usr/bin/env", {
 			args: [
-				"${Command:org.flyx.tex.paths.latexmk.get}",
+				getLatexmk(),
 				"-interaction=nonstopmode",
 				"-synctex=1",
 				"-cd",
@@ -101,7 +105,7 @@ class TexTaskProvider {
 	static contextTask(...options) {
 		return new TaskProcessAction("/usr/bin/env", {
 			args: [
-				"${Command:org.flyx.tex.paths.context.get}",
+				getContext(),
 				"--synctex",
 				...options
 			]
@@ -216,11 +220,11 @@ class TexTaskProvider {
 	}
 	
 	resolveTaskAction(context) {
-		if (context.data == "latex") {
-			const mainfile = context.config.get("org.flyx.tex.latex.mainfile");
+		const latexMainfile = context.config.get("org.flyx.tex.latex.mainfile");
+		if (latexMainfile != null) {
 			const options = context.config.get("org.flyx.tex.latex.latexmk-options");
 			if (context.action == Task.Build) {
-				return TexTaskProvider.latexmkTask(...options, mainfile);
+				return TexTaskProvider.latexmkTask(...options, latexMainfile);
 			} else if (context.action == Task.Run) {
 				return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
 			} else if (context.action == Task.Clean) {
@@ -228,6 +232,10 @@ class TexTaskProvider {
 			}
 		} else {
 			const mainfile = context.config.get("org.flyx.tex.context.mainfile");
+			if (!mainfile) {
+				console.error("[context] no file specified in task settings!");
+				return null;
+			}
 			if (context.action == Task.Build) {
 				return TexTaskProvider.contextTask("--synctex", mainfile);
 			} else if (context.action == Task.Run) {

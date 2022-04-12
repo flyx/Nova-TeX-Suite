@@ -1,3 +1,9 @@
+## Version 1.0.1
+
+LaTeX:
+
+- fixed the task template not being able to call latexmk
+
 ## Version 1.0.0
 
 This release is the result of merging https://github.com/mava/Nova-LaTeX into the TeX Suite.
