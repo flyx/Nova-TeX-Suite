@@ -83,7 +83,6 @@ function displayLine(pdf) {
 		args.push("-background");
 	}
 	args.push("$LineNumber", pdf, "$File");
-	args.push(pdf)
 	return new TaskProcessAction("/usr/bin/env", {args: args});
 }
 
@@ -226,9 +225,9 @@ class TexTaskProvider {
 			if (context.action == Task.Build) {
 				return TexTaskProvider.latexmkTask(...options, latexMainfile);
 			} else if (context.action == Task.Run) {
-				return displayLine(nova.path.join(nova.path.dirname(mainfile), nova.path.splitext(mainfile)[0]) + ".pdf");
+				return displayLine(nova.path.join(nova.path.dirname(latexMainfile), nova.path.splitext(latexMainfile)[0]) + ".pdf");
 			} else if (context.action == Task.Clean) {
-				return TexTaskProvider.latexmkTask("-c", mainfile);
+				return TexTaskProvider.latexmkTask("-c", latexMainfile);
 			}
 		} else {
 			const mainfile = context.config.get("org.flyx.tex.context.mainfile");

@@ -1,3 +1,9 @@
+## Version 1.0.2
+
+LaTeX:
+
+- fixed the task template's Run task
+
 ## Version 1.0.1
 
 LaTeX:
