@@ -1,3 +1,7 @@
+## Version 1.0.3
+
+- fixed a bug that prevented the language servers to be started
+
 ## Version 1.0.2
 
 LaTeX:

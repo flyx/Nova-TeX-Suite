@@ -4,6 +4,7 @@ let langservers = {
 };
 
 function resetLangServer(enabled) {
+	console.info(`resetLangServer(${this}, ${enabled})`)
 	if (enabled) {
 		if (!langservers[this].enabled) {
 			langservers[this].enabled = true;
@@ -15,8 +16,8 @@ function resetLangServer(enabled) {
 	}
 }
 
-function enableConfigCallback() {
-	resetLangServer.call(this);
+function enableConfigCallback(value) {
+	resetLangServer.call(this, value);
 	nova.workspace.reloadTasks(TexTaskProvider.identifier);
 }
 
@@ -24,10 +25,11 @@ exports.activate = () => {
 	console.log("Activating TeX Suite");
 	for (const lang of ["latex", "context"]) {
 		langservers[lang] = new TexLanguageServer(lang);
-		nova.workspace.config.onDidChange(`org.flyx.tex.${lang}.enable`, enableConfigCallback, lang);
-		resetLangServer.call(lang, nova.config.get(`org.flyx.tex.${lang}.enable`));
+		const cfgName = `org.flyx.tex.${lang}.enable`;
+		nova.workspace.config.observe(cfgName, enableConfigCallback, lang);
 	}
 }
+
 exports.deactivate = () => {
 	console.log("Deactivating TeX Suite");
 	for (const lang of ["latex", "context"]) {
