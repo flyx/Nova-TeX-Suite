@@ -85,7 +85,7 @@ function displayLine(pdf) {
 		args.push("-background");
 	}
 	args.push("$LineNumber", pdf, "$File");
-	return new TaskProcessAction("/usr/bin/env", {args: args});
+	return new TaskProcessAction("/usr/bin/env", {args: args, env: nova.environment});
 }
 
 class TexTaskProvider {
@@ -99,7 +99,8 @@ class TexTaskProvider {
 				"-synctex=1",
 				"-cd",
 				...options
-			]
+			],
+			env: nova.environment
 		});
 	}
 	
@@ -109,7 +110,8 @@ class TexTaskProvider {
 				getContext(),
 				"--synctex",
 				...options
-			]
+			],
+			env: nova.environment
 		});
 	}
 	
@@ -274,7 +276,7 @@ class TexLanguageServer {
 		}
 		const path = nova.config.get(this.config_name);
 		const proc = new Process("/usr/bin/which", {
-			args: [path]
+			args: [path], env: nova.environment
 		});
 		let abs_path = null;
 		proc.onStdout((line) => {

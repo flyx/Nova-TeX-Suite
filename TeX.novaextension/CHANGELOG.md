@@ -1,3 +1,7 @@
+## Version 1.0.4
+
+- fixed a problem with newer 10.x Nova versions that could crash the language server
+
 ## Version 1.0.3
 
 - fixed a bug that prevented the language servers to be started
